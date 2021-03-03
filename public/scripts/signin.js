@@ -85,7 +85,7 @@ function placeTestCards(data)
         test.setAttribute("id", "startTest")
         test.setAttribute("type", "button")
         test.setAttribute("class", "btn btn-outline-success col-md-6")
-        if(data[7])// && !data[8])
+        if(data[7] && !data[8])
         {
             test.onclick = ()=>{
                 var today = new Date();
@@ -171,7 +171,7 @@ function placeTestCards(data)
     }
     div1.appendChild(div2)
     div1.appendChild(div3)
-    //if(data[7] && data[8])
+    if(data[7] && data[8])
         {
             let but = document.createElement('button')
             but.setAttribute("class", "btn btn-danger col-md-12")
