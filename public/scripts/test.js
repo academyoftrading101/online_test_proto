@@ -70,10 +70,10 @@ function placeQuestion(data)
                     optionsUl.children[i].style.backgroundColor = "gray";
                 }
                 optionLi.style.backgroundColor = "black"
-                let btnId = document.getElementsByClassName('btn-warning')[0].id
-                document.getElementsByClassName('btn-warning')[0].classList.remove("btn-warning")
-                document.getElementById(btnId).classList.remove("btn-outline-success")
-                document.getElementById(btnId).classList.add("btn-success")
+                //let btnId = document.getElementsByClassName('btn-warning')[0].id
+                document.getElementById(currentId).classList.remove("btn-warning")
+                document.getElementById(currentId).classList.remove("btn-outline-success")
+                document.getElementById(currentId).classList.add("btn-success")
                 for(let i = 0; i < totalQuestions; i++)
                 {
                     if(marked[i].questionId == mainLi.id)
@@ -145,6 +145,10 @@ socket.on("getQuestions", questions=>{
     {
         socket.emit("attempted", {uid:userId, tname:testName})
     }
+    if(currentId == "")
+    {
+        currentId = "question0"
+    }
     totalQuestions = questions.length
     let once = true
     for(let i = 0; i < questions.length; i++)
@@ -159,18 +163,22 @@ socket.on("getQuestions", questions=>{
     //console.log(marked)
 
     document.getElementById("flagButton").onclick = ()=>{
-        if(document.getElementsByClassName("btn-warning")[0] != undefined) 
+        //console.log(currentId)
+        if(!document.getElementById(currentId).classList.contains("btn-danger")) 
         {
-            console.log(document.getElementsByClassName("btn-warning")[0])
-            document.getElementsByClassName("btn-warning")[0].id
-            document.getElementsByClassName("btn-warning")[0].setAttribute("class", "btn btn-danger")
+            //console.log(document.getElementsByClassName("btn-warning")[0])
+            document.getElementById(currentId).setAttribute("class", "btn btn-danger")
             //document.getElementsByClassName("btn-warning")[0].setAttribute("class", "btn btn-warning")
             //once2 = true
             document.getElementById("flagButton").innerHTML = "unflag"
         }
         else
         {
-            document.getElementById(currentId).setAttribute("class", "btn btn-warning")
+            if(marked[(document.getElementById(currentId).innerHTML)-1].marked)
+                document.getElementById(currentId).setAttribute("class", "btn btn-success")
+            else
+                document.getElementById(currentId).setAttribute("class", "btn btn-warning")
+            document.getElementById("flagButton").innerHTML = "flag"
         }
         
     }
