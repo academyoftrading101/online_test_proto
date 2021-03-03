@@ -539,6 +539,11 @@ io.on('connection', function(socket){
           });
     })
 
+    socket.on("getTestCards", async ()=>{
+        let tests = await Tests.find({})
+        socket.emit("testData", tests)
+    })
+
     socket.on("disconnect", async ()=>{
         try{
             if(SOCKET_LIST[socket.id].isAdmin)
