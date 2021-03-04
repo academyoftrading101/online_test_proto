@@ -1,6 +1,6 @@
 const socket = io.connect();
-var listofInputs = new Array(8)
-listofInputs = ["", "", "", "", "", "", "", ""];
+var listofInputs = new Array(9)
+listofInputs = ["", "", "", "", "", "", "", "", ""];
 
 
 function tryLogin()
@@ -32,7 +32,7 @@ let allGood2 = [false, false, false]
 
 function validateAll()
 {
-    let allGood = [false, false, false, false, false, false, false, false];
+    let allGood = [false, false, false, false, false, false, false, false, false];
     for(var i = 0; i < listofInputs.length; i++)
     {
         listofInputs[i] = document.getElementById("input1"+i).value
@@ -58,7 +58,7 @@ function validateAll()
             return
         }
     }
-    for(let i = 5; i < listofInputs.length; i++)
+    for(let i = 5; i < 8; i++)
     {
         socket.emit("checkNoOfQuestions", {i:(i-5), j:listofInputs[i]} )
     }
@@ -86,6 +86,7 @@ function validateAll()
                 return
             }
         }
+        //console.log(listofInputs)
         socket.emit("newTest", listofInputs)
         allGood2 = [false, false, false]
     })
@@ -94,11 +95,11 @@ function validateAll()
 
 function placeTestCards(data)
 {
-    //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time
+    //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time 6= testDuration
     let testList = document.getElementById("tests")
     let div1 = document.createElement('div')
     div1.setAttribute("id", data[0])
-    div1.setAttribute("class", "card mb-3")
+    div1.setAttribute("class", "card col-md-4 mb-3 mr-2")
     div1.setAttribute("style", "max-width: 18rem; background-color: #AFF9CA")
     let div2 = document.createElement('div')
     div2.setAttribute("class", "card-header")
@@ -120,11 +121,15 @@ function placeTestCards(data)
     let p4 = document.createElement('p')
     p4.setAttribute("class", "card-text")
     p4.appendChild(document.createTextNode("login after : "+data[5] + " no late entry would be allowed"))
+    let p5 = document.createElement('p')
+    p5.setAttribute("class", "card-text")
+    p5.appendChild(document.createTextNode("test duration : "+data[6]))
     div3.appendChild(h5)
     div3.appendChild(p1)
     div3.appendChild(p2)
     div3.appendChild(p3)
     div3.appendChild(p4)
+    div3.appendChild(p5)
     div1.appendChild(div2)
     div1.appendChild(div3)
     if(data[2])
@@ -329,12 +334,23 @@ socket.on("adminLoggedIn", (data, data1)=>{
         document.getElementById("admin_login_form").style.display = "none";
         document.getElementById("welcome-msg").innerHTML = 'Welcome Admin, '+data[0].userName;   
         document.getElementById("upcoming-tests").style.display = "block"; 
+        document.getElementById("tests").style.display = "block"
         document.getElementById("questionBank").style.display = "block";
     }
     for(let i = 0; i<data1.length; i++)
     {
-        let cardDate = [data1[i].testName, data1[i].description, true, data1[i].date, data1[i].startTime, data1[i].timeFrom]
+        let testTime = data1[i].testTime
+        if(data1[i].testTime > 60)
+        {
+            testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+        }
+        else
+        {
+            testTime = testTime + " mins"
+        }
+        let cardDate = [data1[i].testName, data1[i].description, true, data1[i].date, data1[i].startTime, data1[i].timeFrom, testTime]
         placeTestCards(cardDate)
+        
     }
 });
 
@@ -356,9 +372,18 @@ socket.on("adminLogInFailed", (data)=>{
 socket.on("testAdded", (id)=>{
     testId = id
     document.getElementById("modal-title").innerHTML = "Success";
-    document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully created a new test<br>now add questions to it.</p>';
+    document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully created a new test</p>';
     $('#modal').modal('toggle');
-    let cardDate = [document.getElementById("input10").value, document.getElementById("input14").value, true, document.getElementById("input11").value, document.getElementById("input12").value, document.getElementById("input13").value]
+    let testTime = document.getElementById("input18").value
+    if(testTime > 60)
+    {
+        testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+    }
+    else
+    {
+        testTime = testTime + " mins"
+    }
+    let cardDate = [document.getElementById("input10").value, document.getElementById("input14").value, true, document.getElementById("input11").value, document.getElementById("input12").value, document.getElementById("input13").value, testTime]
     placeTestCards(cardDate)
 })
 

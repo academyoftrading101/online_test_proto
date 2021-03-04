@@ -41,7 +41,7 @@ function getCookie(cname) {
 
 function placeTestCards(data)
 {
-    //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time 6=tests 7= ismytests 8= attempted
+    //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time 6=tests 7= ismytests 8= testDuration 9= attempted
     let testList = document.getElementById(data[6])
     let div1 = document.createElement('div')
     if(data[7])
@@ -73,19 +73,23 @@ function placeTestCards(data)
     let p4 = document.createElement('p')
     p4.setAttribute("class", "card-text")
     p4.appendChild(document.createTextNode("login after : "+data[5] + " no late entry would be allowed"))
+    let p5 = document.createElement('p')
+    p5.setAttribute("class", "card-text")
+    p5.appendChild(document.createTextNode("test duration : "+data[8]))
     
     div3.appendChild(h5)
     div3.appendChild(p1)
     div3.appendChild(p2)
     div3.appendChild(p3)
     div3.appendChild(p4)
+    div3.appendChild(p5)
     if(!data[2])
     {
         let test = document.createElement('button')
         test.setAttribute("id", "startTest")
         test.setAttribute("type", "button")
         test.setAttribute("class", "btn btn-outline-success col-md-6")
-        if(data[7] && !data[8])
+        if(data[7])// && !data[9])
         {
             test.onclick = ()=>{
                 var today = new Date();
@@ -156,7 +160,7 @@ function placeTestCards(data)
             div3.appendChild(test);
         }
                
-        if(data[7] && !data[8])
+        if(data[7] && !data[9])
         {
             let test2 = document.createElement('button')
             test2.setAttribute("id", "startTest2")
@@ -171,7 +175,7 @@ function placeTestCards(data)
     }
     div1.appendChild(div2)
     div1.appendChild(div3)
-    if(data[7] && data[8])
+    if(data[7] && data[9])
         {
             let but = document.createElement('button')
             but.setAttribute("class", "btn btn-danger col-md-12")
@@ -206,7 +210,16 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     }    
     for(let i = 0; i<testsData.length; i++)
     {
-        let upcomingCardData = [testsData[i].testName, testsData[i].description, false, testsData[i].date, testsData[i].startTime, testsData[i].timeFrom, "tests", false]
+        let testTime = testsData[i].testTime
+        if(testsData[i].testTime > 60)
+        {
+            testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+        }
+        else
+        {
+            testTime = testTime + " mins"
+        }
+        let upcomingCardData = [testsData[i].testName, testsData[i].description, false, testsData[i].date, testsData[i].startTime, testsData[i].timeFrom, "tests", false, testTime]
         placeTestCards(upcomingCardData);
     }
     let attempted = false
@@ -219,7 +232,16 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
                 break
             }
         }
-        let myCardData = [myTestsData[i].testName, myTestsData[i].description, false, myTestsData[i].date, myTestsData[i].startTime, myTestsData[i].timeFrom, "myTests", true, attempted]
+        let testTime = myTestsData[i].testTime
+        if(myTestsData[i].testTime > 60)
+        {
+            testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+        }
+        else
+        {
+            testTime = testTime + " mins"
+        }
+        let myCardData = [myTestsData[i].testName, myTestsData[i].description, false, myTestsData[i].date, myTestsData[i].startTime, myTestsData[i].timeFrom, "myTests", true, testTime, attempted]
         placeTestCards(myCardData);       
     }
 });
@@ -249,7 +271,16 @@ socket.on("registered", (testsData, token)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully registered for beta test<br></p>';
     $('#modal').modal('toggle');
-    let myCardData = [testsData.testName, testsData.description, false, testsData.date, testsData.startTime, testsData.timeFrom, "myTests", true]
+    let testTime = testsData.testTime
+        if(testsData.testTime > 60)
+        {
+            testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+        }
+        else
+        {
+            testTime = testTime + " mins"
+        }
+    let myCardData = [testsData.testName, testsData.description, false, testsData.date, testsData.startTime, testsData.timeFrom, "myTests", true, testTime]
     placeTestCards(myCardData);
     var d = new Date();
     d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));

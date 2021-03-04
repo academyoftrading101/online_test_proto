@@ -140,7 +140,7 @@ function submitTest()
     socket.emit("submission", {marked:marked, uid:userId, testName:testName})
 }
 
-socket.on("getQuestions", questions=>{
+socket.on("getQuestions", (questions, testTime)=>{
     if(questions.length != 0)
     {
         socket.emit("attempted", {uid:userId, tname:testName})
@@ -185,6 +185,20 @@ socket.on("getQuestions", questions=>{
     
     
     placeQuestion([questions[0]._id, questions[0].question, questions[0].option1, questions[0].option2, questions[0].option3, questions[0].option4])
+    document.getElementById("timerBox").style.display  = "flex"
+    if (window.Worker) {
+
+        var timerWorker = new Worker('/scripts/workers/timer.js');
+        timerWorker.postMessage(Number(testTime))
+        timerWorker.onmessage = function(e) {
+            document.getElementById("timer").innerHTML = e.data
+            if(e.data == "0h 0m 0s")
+            {
+                submitTest()
+                document.getElementById("timerBox").style.display = "none"
+            }
+        }
+      }
     let questionList = document.getElementById("questionsList")
     
     

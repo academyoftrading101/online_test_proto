@@ -291,6 +291,7 @@ io.on('connection', function(socket){
                     testData.noofquestions.push(_testData[5])
                     testData.noofquestions.push(_testData[6])
                     testData.noofquestions.push(_testData[7])
+                    testData.testTime = _testData[8]
                     let tests = new Tests(testData);
                     await tests.save(function(err, data)
                     {
@@ -474,7 +475,7 @@ io.on('connection', function(socket){
                 n++
             }
         }
-        socket.emit("getQuestions", noofquestions)
+        socket.emit("getQuestions", noofquestions, test.testTime)
     })
 
     socket.on("submission", async (d)=>{
