@@ -203,6 +203,10 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "Successfully Logged In";
     $('#modal').modal('toggle');
+    document.getElementById("signup").style.display = "none"
+    document.getElementById("signin").style.display = "none"
+    document.getElementById("logout").style.display = "block"
+    document.getElementById("logouthref").setAttribute("href", "signin")
     document.getElementById("modal-cancel").onclick = function(){
         document.getElementById("login_form").style.display = "none";
         document.getElementById("welcome-msg").innerHTML = 'Welcome, '+data[0].userName;
