@@ -186,7 +186,8 @@ socket.on("getQuestions", (questions, testTime)=>{
     
     placeQuestion([questions[0]._id, questions[0].question, questions[0].option1, questions[0].option2, questions[0].option3, questions[0].option4])
     document.getElementById("timerBox").style.display  = "flex"
-    if (window.Worker) {
+    if (window.Worker) 
+    {
 
         var timerWorker = new Worker('/scripts/workers/timer.js');
         timerWorker.postMessage(Number(testTime))
@@ -198,7 +199,24 @@ socket.on("getQuestions", (questions, testTime)=>{
                 document.getElementById("timerBox").style.display = "none"
             }
         }
-      }
+    }
+
+    document.getElementById("nextButton").onclick = ()=>{
+        if(currentId.slice(8, (currentId.length)) != (totalQuestions - 2))
+        {
+            let n = Number(currentId.slice(8, (currentId.length)))
+            n++;
+            document.getElementById("question"+n).click()
+        }
+        else
+        {
+            let n = Number(currentId.slice(8, (currentId.length)))
+            n++;
+            document.getElementById("question"+n).click()
+            document.getElementById("nextButton").disabled = true
+        }
+    }
+
     let questionList = document.getElementById("questionsList")
     
     
@@ -217,6 +235,10 @@ socket.on("getQuestions", (questions, testTime)=>{
                 button.appendChild(document.createTextNode(((5*i) + j + 1)))
                 button.onclick = ()=>{
                     currentId = "question"+((5*i) + j)
+                    if(currentId.slice(8, (currentId.length)) != (totalQuestions - 1))
+                    {
+                        document.getElementById("nextButton").disabled = false
+                    }
                     placeQuestion([questions[((5*i) + j)]._id, questions[((5*i) + j)].question, questions[((5*i) + j)].option1, questions[((5*i) + j)].option2, questions[((5*i) + j)].option3, questions[((5*i) + j)].option4])
                     if(!document.getElementById("question"+((5*i) + j)).classList.contains("btn-danger") && !document.getElementById("question"+((5*i) + j)).classList.contains("btn-success"))
                     {

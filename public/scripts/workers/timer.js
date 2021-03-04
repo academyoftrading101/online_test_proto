@@ -1,5 +1,5 @@
 onmessage = function(e) {
-    var count = 10//(e.data)
+    var count = (e.data)*60
     var x = setInterval(function() {
         let seconds = count % 60;
         let minutes = Math.floor(count / 60);

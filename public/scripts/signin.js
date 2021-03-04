@@ -160,7 +160,7 @@ function placeTestCards(data)
             div3.appendChild(test);
         }
                
-        if(data[7] && !data[9])
+        if(data[7])// && !data[9])
         {
             let test2 = document.createElement('button')
             test2.setAttribute("id", "startTest2")

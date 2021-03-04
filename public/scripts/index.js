@@ -2,7 +2,7 @@ socket = io.connect()
 
 function placeTestCards(data)
 {
-    //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time
+    //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time 6=testDuration
     let testList = document.getElementById("testListBox")
     let div1 = document.createElement('div')
     div1.setAttribute("id", data[0])
@@ -31,11 +31,15 @@ function placeTestCards(data)
     let p4 = document.createElement('p')
     p4.setAttribute("class", "card-text")
     p4.appendChild(document.createTextNode("login after : "+data[5] + " no late entry would be allowed"))
+    let p5 = document.createElement('p')
+    p5.setAttribute("class", "card-text")
+    p5.appendChild(document.createTextNode("test duration : "+data[6]))
     div3.appendChild(h5)
     div3.appendChild(p1)
     div3.appendChild(p2)
     div3.appendChild(p3)
     div3.appendChild(p4)
+    div3.appendChild(p5)
     let test = document.createElement('button')
     test.setAttribute("id", "startTest")
     test.setAttribute("type", "button")
@@ -56,14 +60,23 @@ socket.emit("getTestCards")
 socket.on("testData", d=>{
     for(let i = 0; i<d.length; i++)
     {
+        let testTime = d[i].testTime
+        if(d[i].testTime > 60)
+        {
+            testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+        }
+        else
+        {
+            testTime = testTime + " mins"
+        }
         if(i == (d.length - 1))
         {
-            let cardDate = [d[i].testName, d[i].description, true, d[i].date, d[i].startTime, d[i].timeFrom]
+            let cardDate = [d[i].testName, d[i].description, true, d[i].date, d[i].startTime, d[i].timeFrom, testTime]
             placeTestCards(cardDate)
         }
         else
         {
-            let cardDate = [d[i].testName, d[i].description, false, d[i].date, d[i].startTime, d[i].timeFrom]
+            let cardDate = [d[i].testName, d[i].description, false, d[i].date, d[i].startTime, d[i].timeFrom, testTime]
             placeTestCards(cardDate)
         }
     }
