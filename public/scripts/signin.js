@@ -53,9 +53,9 @@ function placeTestCards(data)
         div1.setAttribute("style", "max-width: 18rem; background-color: #AFF9CA")
     else
         div1.setAttribute("style", "max-width: 18rem; background-color: #FAFAA3")
-    let div2 = document.createElement('div')
-    div2.setAttribute("class", "card-header")
-    div2.appendChild(document.createTextNode("Test"))
+    //let div2 = document.createElement('div')
+    //div2.setAttribute("class", "card-header")
+    //div2.appendChild(document.createTextNode("Test"))
     let div3 = document.createElement('div')
     div3.setAttribute("class", "card-body")
     let h5 = document.createElement('h5')
@@ -173,7 +173,7 @@ function placeTestCards(data)
             div3.appendChild(test2);
         }
     }
-    div1.appendChild(div2)
+    //div1.appendChild(div2)
     div1.appendChild(div3)
     if(data[7] && data[9])
         {
