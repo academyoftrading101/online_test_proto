@@ -131,12 +131,24 @@ io.on('connection', function(socket){
 
 
     socket.on("newSignUp", async (data)=>{
+        let verify = await Users.find({})
+        for(let i = 0; i < verify.length; i++)
+        {
+            //console.log(verify[i].email + "   " + data[3])
+            if(verify[i].email == data[3])
+            {
+                
+                socket.emit("signupFailed")
+                return
+            }
+        }
         let user = {};
         user.firstName = data[0];
         user.lastName = data[1];
         user.userName = data[2];
         user.email = data[3];
         user.password = data[4];
+        user.alreadyLoggedIn = false
         let userModel = new Users(user);
         await userModel.save();
         socket.emit("signupComplete")

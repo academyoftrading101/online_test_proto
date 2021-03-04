@@ -92,4 +92,13 @@ socket.on("signupComplete", ()=>{
         location.href = "/signin";
     };
 })
+
+socket.on("signupFailed", ()=>{
+    document.getElementById("modal-title").innerHTML = "Failed";
+    document.getElementById("modal-body").innerHTML = "Sign up Failed, an account with this email already exists";
+    $('#modal').modal('toggle');
+    document.getElementById("modal-cancel").onclick = function () {
+        
+    };
+})
     
