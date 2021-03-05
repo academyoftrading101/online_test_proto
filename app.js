@@ -392,7 +392,7 @@ io.on('connection', function(socket){
 
     socket.on("noOfParticipants", async (tName)=>{
         let test = await Tests.findOne({"testName": tName}) 
-        console.log(test.participants.length)
+        //console.log(test.participants.length)
         socket.emit("noOfParticipants", test.participants.length)
     })
 

@@ -94,7 +94,7 @@ function placeTestCards(data)
         test.setAttribute("id", "startTest")
         test.setAttribute("type", "button")
         test.setAttribute("class", "btn btn-outline-success col-md-6")
-        if(data[7])// && !data[9])
+        if(data[7] && !data[9])
         {
             test.onclick = ()=>{
                 var today = new Date();
@@ -115,8 +115,8 @@ function placeTestCards(data)
                 socket.on("currentMACTest", result=>{
                     if(result)
                     {
-                        //if(date == today && data[5] <= time && data[4] >= time)
-                        if(true)
+                        if(date == today && data[5] <= time && data[4] >= time)
+                        //if(true)
                         {
                             var d = new Date();
                             d.setTime(d.getTime() + (12 * 60 * 60 * 1000));
@@ -131,7 +131,7 @@ function placeTestCards(data)
                                 location.href = url
                             })
                         }
-                        else if(data[4] < time)
+                        else if(data[4] < time && date == today)
                         {
                             document.getElementById("modal-title").innerHTML = "failed";
                             document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">you were late, cant attempt this test. try other tests if you like to </p>';
@@ -165,7 +165,7 @@ function placeTestCards(data)
             div3.appendChild(test);
         }
                
-        if(data[7])// && !data[9])
+        if(data[7] && !data[9])
         {
             let test2 = document.createElement('button')
             test2.setAttribute("id", "startTest2")
