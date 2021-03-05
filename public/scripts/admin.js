@@ -5,6 +5,10 @@ listofInputs = ["", "", "", "", "", "", "", "", ""];
 
 function tryLogin()
 {
+    document.getElementById("modal-title").innerHTML = "wait";
+    let text = "Signing in please wait"
+    document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+    $('#modal').modal('toggle');
     socket.emit("tryAdminLogin", document.getElementById("input0").value, document.getElementById("input1").value);
 }
 
@@ -88,6 +92,10 @@ function validateAll()
         }
         //console.log(listofInputs)
         socket.emit("newTest", listofInputs)
+        document.getElementById("modal-title").innerHTML = "wait";
+        let text = "adding new test please wait"
+        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        $('#modal').modal('toggle');
         allGood2 = [false, false, false]
     })
     
@@ -174,7 +182,12 @@ function nextQuestion()
     {   
         document.getElementById("modal-title").innerHTML = "Alert";
         document.getElementById("modal-body").innerHTML = "Please dont leave the Question tab empty";
-        $('#modal').modal('toggle');
+        let timeOut = setTimeout(() => {
+            $('#modal').modal('toggle');
+        }, 2000);
+        $('#modal').on('hidden.bs.modal', function (e) {
+            clearInterval(timeOut)
+        })
     }
     else
     {
@@ -192,6 +205,10 @@ function nextQuestion()
                 inputQuestion.push((i-5))
                 inputQuestion.push(document.getElementById("input38").value)
                 socket.emit("inputQuestion", inputQuestion)
+                document.getElementById("modal-title").innerHTML = "wait";
+                let text = "saving new question please wait"
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
                 return
             }
         }
@@ -258,6 +275,10 @@ function placeQuestion(data)
         button2.onclick = ()=>{
             document.getElementById("updateSearch").style.display = "none"
             socket.emit("deleteQuestion", data[6]);
+            document.getElementById("modal-title").innerHTML = "wait";
+            let text = "deleting question please wait"
+            document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+            $('#modal').modal('toggle');
         }
         button2.appendChild(document.createTextNode("Delete"))
         mainLi.appendChild(button);
@@ -320,6 +341,19 @@ function setNumberOfQuestions(id, n)
     // set questions from here
 }
 
+function loggedIn(uName)
+{
+    document.getElementById("admin_login_form").style.display = "none";
+    document.getElementById("welcome-msg").innerHTML = 'Welcome Admin, '+uName;   
+    document.getElementById("upcoming-tests").style.display = "block"; 
+    document.getElementById("tests").style.display = "block"
+    document.getElementById("questionBank").style.display = "block";
+    document.getElementById("signup").style.display = "none"
+    document.getElementById("signin").style.display = "none"
+    document.getElementById("logout").style.display = "block"
+    document.getElementById("logouthref").setAttribute("href", "admin")
+}
+
 socket.on("adminLoggedIn", (data, data1)=>{
     document.getElementById("input0").classList.remove("is-invalid");
     document.getElementById("input0").classList.add("is-valid");
@@ -329,18 +363,16 @@ socket.on("adminLoggedIn", (data, data1)=>{
     document.getElementById("invalid1").innerHTML = ""
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "Successfully Logged In";
-    $('#modal').modal('toggle');
-    document.getElementById("signup").style.display = "none"
-    document.getElementById("signin").style.display = "none"
-    document.getElementById("logout").style.display = "block"
-    document.getElementById("logouthref").setAttribute("href", "admin")
-    document.getElementById("modal-cancel").onclick = function(){
-        document.getElementById("admin_login_form").style.display = "none";
-        document.getElementById("welcome-msg").innerHTML = 'Welcome Admin, '+data[0].userName;   
-        document.getElementById("upcoming-tests").style.display = "block"; 
-        document.getElementById("tests").style.display = "block"
-        document.getElementById("questionBank").style.display = "block";
-    }
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+        loggedIn(data[0].userName)
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+        loggedIn(data[0].userName)
+    })
+    
     for(let i = 0; i<data1.length; i++)
     {
         let testTime = data1[i].testTime
@@ -359,6 +391,14 @@ socket.on("adminLoggedIn", (data, data1)=>{
 });
 
 socket.on("adminLogInFailed", (data)=>{
+    document.getElementById("modal-title").innerHTML = "Failed";
+    document.getElementById("modal-body").innerHTML = "Failed to login";
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     if(data == "email")
     {
         document.getElementById("input0").classList.remove("is-valid");
@@ -377,7 +417,12 @@ socket.on("testAdded", (id)=>{
     testId = id
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully created a new test</p>';
-    $('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     let testTime = document.getElementById("input18").value
     if(testTime > 60)
     {
@@ -397,13 +442,23 @@ socket.on("testAlreadyExists", ()=>{
     document.getElementById("invalid10").innerHTML = "already exists"
     document.getElementById("modal-title").innerHTML = "Failed";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">test with that name already exists</p>';
-    $('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
 })
 
 socket.on("saved", ()=>{
     document.getElementById("modal-title").innerHTML = "success";
     document.getElementById("modal-body").innerHTML = "question saved";
-    $('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     for(let i = 0; i<5; i++)
         {
             document.getElementById("input3"+i).value = ""
@@ -461,6 +516,10 @@ socket.on("updateQuestion", (question)=>{
             {
                 newValues[6] = String(i-6)
                 socket.emit("updateValues", {n:newValues, qid:question._id})
+                document.getElementById("modal-title").innerHTML = "wait";
+                let text = "updating question please wait"
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
                 return
             }
             else
@@ -475,7 +534,12 @@ socket.on("updateQuestion", (question)=>{
 socket.on("updated", ()=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "Successfully Updated the question";
-    $('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     document.getElementById("questionUpdateField").style.display = "none"
     updateList();
 })
@@ -483,7 +547,12 @@ socket.on("updated", ()=>{
 socket.on("deleted", ()=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "Successfully deleted the question";
-    $('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     updateList();
 })
 
@@ -521,5 +590,10 @@ socket.on("alreadyLoggedIn", ()=>{
         footer.appendChild(useHere)
         once2 = false
     }
-    $('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
 })

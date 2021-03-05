@@ -538,7 +538,7 @@ io.on('connection', function(socket){
             from: 'vashisthnk621@gmail.com',
             to: email,
             subject: 'Your password for onlinetest-prototype account',
-            text: 'your password was - '+pass
+            text: 'your password is - '+pass
           };
           
           transporter.sendMail(mailOptions, function(error, info){

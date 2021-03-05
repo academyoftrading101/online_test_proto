@@ -10,15 +10,20 @@ var userData;
 function tryLogin()
 {
     socket.emit("tryLogin", document.getElementById("input0").value, document.getElementById("input1").value);
+    document.getElementById("modal-title").innerHTML = "wait";
+    document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+    $('#modal').modal('toggle');
 }
 
 function testi(){
 }
 
-
 function register(data){
     //console.log(userData[0])
     socket.emit("register", {id:userData[0]._id, d:data})
+    document.getElementById("modal-title").innerHTML = "wait";
+    document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Registering for the test please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+    $('#modal').modal('toggle');
     // document.getElementById("modal-title").innerHTML = "Waiting";
     // document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: x-large;">Registering...</p>';
     // $('#modal').modal('toggle');
@@ -188,7 +193,21 @@ function placeTestCards(data)
 
 function forgotpassword()
 {
+    document.getElementById("modal-title").innerHTML = "wait";
+    document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">sending email to entered mail please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+    $('#modal').modal('toggle');
     socket.emit("forgotPassword", document.getElementById("input0").value)
+}
+
+function loggedIn(uName)
+{
+    document.getElementById("login_form").style.display = "none";
+    document.getElementById("welcome-msg").innerHTML = 'Welcome, '+uName;
+    document.getElementById("upcoming-tests").style.display = "flex";
+    document.getElementById("signup").style.display = "none"
+    document.getElementById("signin").style.display = "none"
+    document.getElementById("logout").style.display = "block"
+    document.getElementById("logouthref").setAttribute("href", "signin")
 }
 
 socket.on("LoggedIn", (data, testsData, myTestsData)=>{
@@ -202,16 +221,16 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     document.getElementById("invalid1").innerHTML = ""
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "Successfully Logged In";
-    $('#modal').modal('toggle');
-    document.getElementById("signup").style.display = "none"
-    document.getElementById("signin").style.display = "none"
-    document.getElementById("logout").style.display = "block"
-    document.getElementById("logouthref").setAttribute("href", "signin")
-    document.getElementById("modal-cancel").onclick = function(){
-        document.getElementById("login_form").style.display = "none";
-        document.getElementById("welcome-msg").innerHTML = 'Welcome, '+data[0].userName;
-        document.getElementById("upcoming-tests").style.display = "flex";
-    }    
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+        loggedIn(data[0].userName)
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+        loggedIn(data[0].userName)
+    })
+    
     for(let i = 0; i<testsData.length; i++)
     {
         let testTime = testsData[i].testTime
@@ -251,6 +270,15 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
 });
 
 socket.on("LogInFailed", (data)=>{
+    document.getElementById("modal-title").innerHTML = "Failed";
+    document.getElementById("modal-body").innerHTML = "Failed to login";
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     if(data == "email")
     {
         document.getElementById("input0").classList.remove("is-valid");
@@ -268,13 +296,25 @@ socket.on("LogInFailed", (data)=>{
 socket.on("alreadyRegistered", ()=>{
     document.getElementById("modal-title").innerHTML = "Failed";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">You are already Registered for this test</p>';
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
 })
 
 socket.on("registered", (testsData, token)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully registered for beta test<br></p>';
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     let testTime = testsData.testTime
         if(testsData.testTime > 60)
         {
@@ -313,24 +353,48 @@ socket.on("alreadyLoggedIn", ()=>{
         footer.appendChild(useHere)
         once2 = false
     }
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 3000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
 })
 
 socket.on("unregister", (testName)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "you have unregistered from this test";
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
     document.getElementById(testName+"1").style.display = "none"
 })
 
 socket.on("emailSent", ()=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "an email has been sent to the entered email";
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 3000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
 })
 
 socket.on("forgotPasswordFailed", ()=>{
     document.getElementById("modal-title").innerHTML = "Failed";
     document.getElementById("modal-body").innerHTML = "this email is not registered with this website";
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 3000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
 })
