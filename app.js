@@ -121,6 +121,8 @@ function shuffle(array) {
 
 var SOCKET_LIST = []
 
+let testURL = ""
+
 var io = require('socket.io')(serv,{});
 
 io.on('connection', function(socket){
@@ -453,7 +455,7 @@ io.on('connection', function(socket){
     })
 
     socket.on("newUrl", d=>{
-        //console.log(d)
+        testURL = d
         app.get(d, (req, res) =>
         {
             res.sendFile(__dirname + '/test.html');
@@ -555,6 +557,18 @@ io.on('connection', function(socket){
     socket.on("getTestCards", async ()=>{
         let tests = await Tests.find({})
         socket.emit("testData", tests)
+    })
+
+    socket.on("reloaded", async ()=>{
+        await app.delete(testURL, (req, res) => {
+            res.send("deleted")
+            console.log("deleted " + testURL)  
+        }) 
+        app.get(testURL, (req, res) =>
+        {
+            res.sendFile(__dirname + 'index.html');
+        }); 
+        socket.emit("newUrl", testURL)
     })
 
     socket.on("disconnect", async ()=>{

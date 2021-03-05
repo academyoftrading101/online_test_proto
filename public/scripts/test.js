@@ -6,6 +6,14 @@ var marked = []
 var testName = ""
 var userId = ""
 
+if (performance.navigation.type == performance.navigation.TYPE_RELOAD) 
+{
+    socket.emit("reloaded")
+    socket.on("newUrl", (url)=>{
+        location.href = url
+    })
+}
+
 function loadTest()
 {
     if(!document.getElementById("iAgree").checked)
