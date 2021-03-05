@@ -5,10 +5,11 @@ var totalQuestions = 0
 var marked = []
 var testName = ""
 var userId = ""
+var submitted = false
 
 if (performance.navigation.type == performance.navigation.TYPE_RELOAD) 
 {
-    location.href = "index"
+    location.href = "signin"
     // socket.emit("reloaded")
     // socket.on("newUrl", (url)=>{
     //     location.href = url
@@ -192,99 +193,113 @@ socket.on("getQuestions", (questions, testTime)=>{
         
     }
     
-    
-    placeQuestion([questions[0]._id, questions[0].question, questions[0].option1, questions[0].option2, questions[0].option3, questions[0].option4])
-    document.getElementById("timerBox").style.display  = "flex"
-    if (window.Worker) 
-    {
-
-        var timerWorker = new Worker('/scripts/workers/timer.js');
-        timerWorker.postMessage(Number(testTime))
-        timerWorker.onmessage = function(e) {
-            document.getElementById("timer").innerHTML = e.data
-            if(e.data == "0h 0m 0s")
-            {
-                submitTest()
-                document.getElementById("timerBox").style.display = "none"
-            }
-        }
-    }
-
-    document.getElementById("nextButton").onclick = ()=>{
-        if(currentId.slice(8, (currentId.length)) != (totalQuestions - 2))
+    socket.emit("checkReattempt",{uid:userId, tname:testName})
+    socket.on("checkReattempt", bool=>{
+        if(!bool)
         {
-            let n = Number(currentId.slice(8, (currentId.length)))
-            n++;
-            document.getElementById("question"+n).click()
+            placeQuestion([questions[0]._id, questions[0].question, questions[0].option1, questions[0].option2, questions[0].option3, questions[0].option4])
+            document.getElementById("timerBox").style.display  = "flex"
+            if (window.Worker) 
+            {
+        
+                var timerWorker = new Worker('/scripts/workers/timer.js');
+                timerWorker.postMessage(Number(testTime))
+                timerWorker.onmessage = function(e) {
+                    if(!submitted)
+                    {
+                        document.getElementById("timer").innerHTML = e.data
+                        if(e.data == "0h 0m 0s")
+                        {
+                            submitTest()
+                            document.getElementById("timerBox").style.display = "none"
+                        }                        
+                    }
+                }
+            }
+        
+            document.getElementById("nextButton").onclick = ()=>{
+                if(currentId.slice(8, (currentId.length)) != (totalQuestions - 2))
+                {
+                    let n = Number(currentId.slice(8, (currentId.length)))
+                    n++;
+                    document.getElementById("question"+n).click()
+                }
+                else
+                {
+                    let n = Number(currentId.slice(8, (currentId.length)))
+                    n++;
+                    document.getElementById("question"+n).click()
+                    document.getElementById("nextButton").disabled = true
+                }
+            }
+        
+            let questionList = document.getElementById("questionsList")
+            
+            
+            for(let i = 0; i < Math.ceil(questions.length/5); i++)
+            {
+                let row = document.createElement('div')
+                row.setAttribute("class", "row pl-3 pr-3 pt-2 d-flex justify-content-around")
+                row.setAttribute("id", "questionListRow"+i)
+                for(let j = 0; j < 5; j++)
+                {
+                    if(((5*i) + j)<questions.length)
+                    {   
+                        let button = document.createElement('button')
+                        button.setAttribute("id", "question"+((5*i) + j))
+                        button.setAttribute("class", "btn btn-outline-success")  // mr-auto
+                        button.appendChild(document.createTextNode(((5*i) + j + 1)))
+                        button.onclick = ()=>{
+                            currentId = "question"+((5*i) + j)
+                            if(currentId.slice(8, (currentId.length)) != (totalQuestions - 1))
+                            {
+                                document.getElementById("nextButton").disabled = false
+                            }
+                            placeQuestion([questions[((5*i) + j)]._id, questions[((5*i) + j)].question, questions[((5*i) + j)].option1, questions[((5*i) + j)].option2, questions[((5*i) + j)].option3, questions[((5*i) + j)].option4])
+                            if(!document.getElementById("question"+((5*i) + j)).classList.contains("btn-danger") && !document.getElementById("question"+((5*i) + j)).classList.contains("btn-success"))
+                            {
+                                document.getElementById("flagButton").innerHTML = "flag"
+                                document.getElementById("question"+((5*i) + j)).classList.add("btn-warning")
+                                document.getElementById("question"+((5*i) + j)).classList.remove("btn-outline-success")
+                            }
+                            else if(document.getElementById("question"+((5*i) + j)).classList.contains("btn-danger"))
+                            {
+                                document.getElementById("flagButton").innerHTML = "unflag"
+                            }
+                            for(let k = 0; k < questions.length; k++)
+                            {
+                                if(k != ((5*i) + j) && !document.getElementById("question"+k).classList.contains("btn-danger") && !document.getElementById("question"+k).classList.contains("btn-success"))
+                                {
+                                    document.getElementById("question"+k).classList.add("btn-outline-success")
+                                    document.getElementById("question"+k).classList.remove("btn-warning")
+                                }
+                            }
+                        }
+                        row.appendChild(button)
+                    }
+                    else
+                    {
+                        continue
+                    }
+                }
+                questionList.appendChild(row)
+                if(once)
+                {
+                    document.getElementById("question0").setAttribute("class", "btn btn-warning")
+                    once = false
+                }
+            }
         }
         else
         {
-            let n = Number(currentId.slice(8, (currentId.length)))
-            n++;
-            document.getElementById("question"+n).click()
-            document.getElementById("nextButton").disabled = true
+            location.href = "signin"
         }
-    }
-
-    let questionList = document.getElementById("questionsList")
+    })
     
-    
-    for(let i = 0; i < Math.ceil(questions.length/5); i++)
-    {
-        let row = document.createElement('div')
-        row.setAttribute("class", "row pl-3 pr-3 pt-2 d-flex justify-content-around")
-        row.setAttribute("id", "questionListRow"+i)
-        for(let j = 0; j < 5; j++)
-        {
-            if(((5*i) + j)<questions.length)
-            {   
-                let button = document.createElement('button')
-                button.setAttribute("id", "question"+((5*i) + j))
-                button.setAttribute("class", "btn btn-outline-success")  // mr-auto
-                button.appendChild(document.createTextNode(((5*i) + j + 1)))
-                button.onclick = ()=>{
-                    currentId = "question"+((5*i) + j)
-                    if(currentId.slice(8, (currentId.length)) != (totalQuestions - 1))
-                    {
-                        document.getElementById("nextButton").disabled = false
-                    }
-                    placeQuestion([questions[((5*i) + j)]._id, questions[((5*i) + j)].question, questions[((5*i) + j)].option1, questions[((5*i) + j)].option2, questions[((5*i) + j)].option3, questions[((5*i) + j)].option4])
-                    if(!document.getElementById("question"+((5*i) + j)).classList.contains("btn-danger") && !document.getElementById("question"+((5*i) + j)).classList.contains("btn-success"))
-                    {
-                        document.getElementById("flagButton").innerHTML = "flag"
-                        document.getElementById("question"+((5*i) + j)).classList.add("btn-warning")
-                        document.getElementById("question"+((5*i) + j)).classList.remove("btn-outline-success")
-                    }
-                    else if(document.getElementById("question"+((5*i) + j)).classList.contains("btn-danger"))
-                    {
-                        document.getElementById("flagButton").innerHTML = "unflag"
-                    }
-                    for(let k = 0; k < questions.length; k++)
-                    {
-                        if(k != ((5*i) + j) && !document.getElementById("question"+k).classList.contains("btn-danger") && !document.getElementById("question"+k).classList.contains("btn-success"))
-                        {
-                            document.getElementById("question"+k).classList.add("btn-outline-success")
-                            document.getElementById("question"+k).classList.remove("btn-warning")
-                        }
-                    }
-                }
-                row.appendChild(button)
-            }
-            else
-            {
-                continue
-            }
-        }
-        questionList.appendChild(row)
-        if(once)
-        {
-            document.getElementById("question0").setAttribute("class", "btn btn-warning")
-            once = false
-        }
-    }
 })
 
 socket.on("submitted", ()=>{
+    submitted = true;
     document.getElementById("timerBox").style.display = "none"
     setTimeout(() => {
         document.getElementById("modal-title").innerHTML = "Success";

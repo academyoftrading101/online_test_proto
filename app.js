@@ -13,8 +13,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'vashisthneeraj06',
-    pass: 'P@86*&nbx'
+    user: 'academyoftrading101',
+    pass: 'Online123'
   }
 });
 
@@ -569,6 +569,25 @@ io.on('connection', function(socket){
             res.sendFile(__dirname + 'index.html');
         }); 
         socket.emit("newUrl", testURL)
+    })
+
+    socket.on("checkReattempt", async (d)=>{
+        let test = await Tests.findOne({"testName": d.tname})
+        for(let i = 0; i < test.participants.length; i++)
+        {
+            if(test.participants[i].pid == d.uid)
+            {
+                if(test.participants[i].attempted == true)
+                {
+                    socket.emit("checkReattempt", true)
+                }
+                else
+                {
+                    socket.emit("checkReattempt", false)
+                }
+                break
+            }
+        }
     })
 
     socket.on("disconnect", async ()=>{
