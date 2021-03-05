@@ -8,10 +8,11 @@ var userId = ""
 
 if (performance.navigation.type == performance.navigation.TYPE_RELOAD) 
 {
-    socket.emit("reloaded")
-    socket.on("newUrl", (url)=>{
-        location.href = url
-    })
+    location.href = "index"
+    // socket.emit("reloaded")
+    // socket.on("newUrl", (url)=>{
+    //     location.href = url
+    // })
 }
 
 function loadTest()
@@ -284,6 +285,7 @@ socket.on("getQuestions", (questions, testTime)=>{
 })
 
 socket.on("submitted", ()=>{
+    document.getElementById("timerBox").style.display = "none"
     setTimeout(() => {
         document.getElementById("modal-title").innerHTML = "Success";
         document.getElementById("modal-body").innerHTML = 
