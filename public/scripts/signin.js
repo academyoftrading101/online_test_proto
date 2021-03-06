@@ -112,23 +112,34 @@ function placeTestCards(data)
                 let date = data[3];
                 var token = getCookie("token"+userData[0]._id);
                 socket.emit("currentMACTest", {testName:data[0], user:token})
-                socket.on("currentMACTest", result=>{
+                socket.on("currentMACTest", (result)=>{
                     if(result)
                     {
-                        if(date == today && data[5] <= time && data[4] >= time)
                         //if(true)
+                        if(date == today && data[5] <= time && data[4] >= time)
                         {
                             var d = new Date();
                             d.setTime(d.getTime() + (12 * 60 * 60 * 1000));
                             var expires = "expires="+d.toUTCString();
                             document.cookie = "testName="+data[0]+ ";" + expires
+                            document.cookie = "startTime="+data[4]+ ";" + expires
                             document.cookie = "userId="+userData[0]._id+ ";" + expires
-                            console.log(userData[0]._id)
                             let newUrl = "/"+data[0]
                             newUrl = newUrl.replaceAll(/ /g,"%20")
                             socket.emit("newUrl", newUrl)
                             socket.on("newUrl", (url)=>{
-                                location.href = url
+                                document.getElementById("modal-title").innerHTML = "wait";
+                                document.getElementById("modal-body").innerHTML = "starting test please wait";
+                                $('#modal').modal('toggle');
+                                let timeOut = setTimeout(() => {
+                                    $('#modal').modal('toggle');
+                                    location.href = url
+                                }, 2000);
+                                $('#modal').on('hidden.bs.modal', function (e) {
+                                    clearInterval(timeOut)
+                                    location.href = url
+                                })
+                                
                             })
                         }
                         else if(data[4] < time && date == today)
@@ -249,6 +260,7 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     for(let i = 0; i<myTestsData.length; i++)
     {
         for(let j = 0; j < myTestsData[i].participants.length; j++){
+            console.log(myTestsData[i].participants[j].attempted)
             if(myTestsData[i].participants[j].pid == userData[0]._id)
             {
                 attempted = myTestsData[i].participants[j].attempted

@@ -6,6 +6,7 @@ var marked = []
 var testName = ""
 var userId = ""
 var submitted = false
+var startTime = ""
 
 if (performance.navigation.type == performance.navigation.TYPE_RELOAD) 
 {
@@ -14,6 +15,26 @@ if (performance.navigation.type == performance.navigation.TYPE_RELOAD)
     // socket.on("newUrl", (url)=>{
     //     location.href = url
     // })
+}
+
+async function loaded()
+{
+    if (window.Worker) 
+    {
+        let timerWorker = new Worker('/scripts/workers/timer.js');
+        var d = new Date(),
+            h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+            m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+        var time = h + ':' + m;
+        startTime = await getCookie("startTime")
+        document.getElementById("timer2").innerHTML = startTime
+        timerWorker.postMessage({ time: startTime, type: "wait"})
+        timerWorker.onmessage = function (e) 
+        {
+            document.getElementById("continueButton").disabled = false
+            timerWorker.terminate()
+        }
+    }
 }
 
 function loadTest()
@@ -203,7 +224,7 @@ socket.on("getQuestions", (questions, testTime)=>{
             {
         
                 var timerWorker = new Worker('/scripts/workers/timer.js');
-                timerWorker.postMessage(Number(testTime))
+                timerWorker.postMessage({time:Number(testTime), type:"timer" })
                 timerWorker.onmessage = function(e) {
                     if(!submitted)
                     {
@@ -212,7 +233,12 @@ socket.on("getQuestions", (questions, testTime)=>{
                         {
                             submitTest()
                             document.getElementById("timerBox").style.display = "none"
+                            timerWorker.terminate()
                         }                        
+                    }
+                    else
+                    {
+                        timerWorker.terminate()
                     }
                 }
             }
