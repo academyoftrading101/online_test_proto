@@ -185,6 +185,7 @@ function placeTestCards(data)
             test2.appendChild(document.createTextNode("unregister"))
             test2.onclick = ()=>{
                 socket.emit("unregister", {uid:userData[0]._id, testName:data[0]} )
+                console.log("unregistering")
             }
             div3.appendChild(test2);
         }

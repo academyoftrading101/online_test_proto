@@ -280,6 +280,7 @@ io.on('connection', function(socket){
                 await data[0].save()
                 let user = await Users.findOne({"_id": registerData.id})
                 user.tests.push({"testName": registerData.d[0]})
+                await user.save()
                 let token = Token();
                 user.tests[(user.tests.length - 1)].validMacs.push(token)
                 await user.save(async ()=>{
@@ -427,18 +428,28 @@ io.on('connection', function(socket){
         }
     })
 
+    let index = -1
+
     socket.on("unregister", async(d)=>{
+        console.log("unregistering")
         let test = await Tests.findOne({"testName":d.testName})
         //console.log(test)
-        index = test.participants.indexOf(d.uid)
+        for(let i = 0; test.participants.length; i++)
+        {
+            if(test.participants.pid == d.uid)
+            {
+                index = i
+                break
+            }
+        }
         test.participants.splice(index, 1)
+        await test.save();
         let user = await Users.findOne({"_id":d.uid})
         for(let i = 0; i < user.tests.length; i++)
         {
             if(user.tests[i].testName == d.testName)
             {
                 user.tests.splice(i, 1)
-                await test.save();
                 await user.save();
                 socket.emit("unregister", d.testName)
                 return
