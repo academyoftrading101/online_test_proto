@@ -119,6 +119,16 @@ function shuffle(array) {
     return array;
 }
 
+function removeByAttr (arr, attr, value){
+    var i = arr.length;
+    while(i--){
+       if( arr[i] && arr[i][attr] == value ){ 
+           arr.splice(i,1);
+       }
+    }
+    return arr;
+}
+
 var SOCKET_LIST = []
 
 let testURL = ""
@@ -631,6 +641,12 @@ io.on('connection', function(socket){
 
     socket.on("deleteTest", async (testName)=>{
         await Tests.findOneAndDelete({"testName":testName})
+        let users = await Users.find({"tests.testName":testName})
+        for(let i = 0; i < users.length; i++)
+        {
+            removeByAttr(users[i].tests, 'testName', testName)
+            await users[i].save()
+        }
         socket.emit("testDeleted", testName)
     })
 
