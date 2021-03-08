@@ -74,11 +74,6 @@ app.get('/signin', (req, res) =>
     
 }); 
 
-app.get('/test', (req, res) =>
-{
-    res.sendFile(__dirname + '/test.html');
-    
-}); 
 
 
 app.use(express.static(__dirname + '/public'));
