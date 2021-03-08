@@ -166,7 +166,6 @@ function validateAll2(testName)
     
 }
 
-let flag = {}
 
 function placeTestCards(data)
 {
@@ -238,10 +237,6 @@ function placeTestCards(data)
         participants2.setAttribute("style", "display:none;")
         participants2.setAttribute("class", "text-center")
         div1.appendChild(participants2)
-        flag[newLink.valueOf()] = true
-        
-        
-        
     }
     testList.appendChild(div1)
 }
@@ -658,25 +653,10 @@ socket.on("deleted", ()=>{
 
 socket.on("noOfParticipants", (n, id)=>{
     document.getElementById(id+"num").innerHTML = n
-    console.log(flag[id.valueOf()])
-    if(flag[id.valueOf()])
-    {
-        // document.getElementById(id+"Participants").style.display = "block"
-        // document.getElementById(id+"num").style.display = "block"
-        $("#"+id+"Participants").slideDown("slow");
-        $("#"+id+"num").slideDown("slow");  
-        flag[id.valueOf()] = false  
-        //console.log("works1 " + id)            
-    }
-    else
-    {
-        $("#"+id+"Participants").slideUp("slow");
-        $("#"+id+"num").slideUp("slow");  
-        // document.getElementById(id+"Participants").style.display = "none"
-        // document.getElementById(id+"num").style.display = "none"
-        flag[id.valueOf()] = true
-        //console.log("works2 " + id)
-    }
+    document.getElementById("modal-title").innerHTML = "Result";
+    let text = "number of participants : "+n
+    document.getElementById("modal-body").innerHTML = '<p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p>'
+    $('#modal').modal('toggle');
     
 })
 
