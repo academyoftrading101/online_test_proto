@@ -666,7 +666,7 @@ socket.on("noOfParticipants", (n, id)=>{
         $("#"+id+"Participants").slideDown("slow");
         $("#"+id+"num").slideDown("slow");  
         flag[id.valueOf()] = false  
-        console.log("works1 " + id)            
+        //console.log("works1 " + id)            
     }
     else
     {
@@ -675,7 +675,7 @@ socket.on("noOfParticipants", (n, id)=>{
         // document.getElementById(id+"Participants").style.display = "none"
         // document.getElementById(id+"num").style.display = "none"
         flag[id.valueOf()] = true
-        console.log("works2 " + id)
+        //console.log("works2 " + id)
     }
     
 })
