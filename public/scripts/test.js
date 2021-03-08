@@ -292,6 +292,10 @@ socket.on("getQuestions", (questions, testTime)=>{
                             {
                                 document.getElementById("flagButton").innerHTML = "unflag"
                             }
+                            else if(document.getElementById("question"+((5*i) + j)).classList.contains("btn-success"))
+                            {
+                                document.getElementById("flagButton").innerHTML = "flag"
+                            }
                             for(let k = 0; k < questions.length; k++)
                             {
                                 if(k != ((5*i) + j) && !document.getElementById("question"+k).classList.contains("btn-danger") && !document.getElementById("question"+k).classList.contains("btn-success"))
