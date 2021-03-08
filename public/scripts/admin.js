@@ -90,7 +90,6 @@ function validateAll()
                 return
             }
         }
-        //console.log(listofInputs)
         socket.emit("newTest", listofInputs)
         document.getElementById("modal-title").innerHTML = "wait";
         let text = "adding new test please wait"
@@ -100,6 +99,74 @@ function validateAll()
     })
     
 }
+
+function validateAll2(testName)
+{
+    let allGood = [false, false, false, false, false, false, false, false, false];
+    for(var i = 0; i < listofInputs.length; i++)
+    {
+        listofInputs[i] = document.getElementById("input1"+i).value
+        if(listofInputs[i] == "")
+        {
+            document.getElementById("input1"+i).classList.remove("is-valid")
+            document.getElementById("input1"+i).classList.add("is-invalid")
+            document.getElementById("invalid1"+i).innerHTML = "required"
+            allGood[i] = false
+        }
+        else
+        {
+            document.getElementById("input1"+i).classList.remove("is-invalid")
+            document.getElementById("input1"+i).classList.add("is-valid")
+            document.getElementById("invalid1"+i).innerHTML = ""
+            allGood[i] = true
+        }
+    }
+    for(let i in allGood)
+    {
+        if(!allGood[i])
+        {
+            return
+        }
+    }
+    for(let i = 5; i < 8; i++)
+    {
+        socket.emit("checkNoOfQuestions", {i:(i-5), j:listofInputs[i]} )
+    }
+    
+    socket.on("allGood", (b, ij)=>{
+        if(!b)
+        {
+            document.getElementById("input1"+(ij+5)).classList.remove("is-valid")
+            document.getElementById("input1"+(ij+5)).classList.add("is-invalid")
+            document.getElementById("invalid1"+(ij+5)).innerHTML = "Pick a lower number"
+            document.getElementById("modal-title").innerHTML = "Failed";
+            document.getElementById("modal-body").innerHTML = "entered number of questions was too high than available in question bank";
+            $('#modal').modal('toggle');
+            allGood2[ij] = false
+            return
+        }
+        else
+        {
+            allGood2[(ij)] = true
+        }
+        for(let i in allGood2)
+        {
+            if(!allGood2[i])
+            {
+                return
+            }
+        }
+        socket.emit("updateTest", {testName:testName, listofInputs:listofInputs})
+        document.getElementById("modal-title").innerHTML = "wait";
+        let text = "adding new test please wait"
+        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        $('#modal').modal('toggle');
+        allGood2 = [false, false, false]
+    })
+    
+}
+
+let flag = {}
 
 function placeTestCards(data)
 {
@@ -142,6 +209,13 @@ function placeTestCards(data)
     div1.appendChild(div3)
     if(data[2])
     {
+        let editTest = document.createElement('button')
+        editTest.setAttribute("type", "button")
+        editTest.setAttribute("class", "btn btn-outline-success")
+        editTest.onclick = ()=>{
+            showTestUpdateform(data[0])
+        }
+        editTest.appendChild(document.createTextNode('edit test'))
         let test = document.createElement('button')
         let newLink=data[0].replace(/\s+/g, '')
         test.setAttribute("id", newLink+"details")
@@ -149,25 +223,23 @@ function placeTestCards(data)
         test.setAttribute("class", "btn btn-outline-info")
         test.onclick = ()=>{
             //document.getElementById(newLink+"Participants").style.display = "block";
-            socket.emit("noOfParticipants", data[0])
+            socket.emit("noOfParticipants", {testName:data[0], id:newLink})
         }
         test.appendChild(document.createTextNode('view details'))
+        div1.appendChild(editTest);
         div1.appendChild(test);
         let participants = document.createElement('div')
         participants.setAttribute("id", newLink+"Participants")
         participants.setAttribute("style", "display:none;")
         participants.appendChild(document.createTextNode('no. of Participants :'))
         div1.appendChild(participants)
-        socket.on("noOfParticipants", n=>{
-            let participants2 = document.createElement('div')
-            participants2.setAttribute("id", newLink+"num")
-            participants2.setAttribute("style", "display:none;")
-            participants2.setAttribute("class", "text-center")
-            participants2.appendChild(document.createTextNode(n))
-            div1.appendChild(participants2)
-            $("#"+newLink+"Participants").slideDown("slow");
-            $("#"+newLink+"num").slideDown("slow");
-        })
+        let participants2 = document.createElement('div')
+        participants2.setAttribute("id", newLink+"num")
+        participants2.setAttribute("style", "display:none;")
+        participants2.setAttribute("class", "text-center")
+        div1.appendChild(participants2)
+        flag[newLink.valueOf()] = true
+        
         
         
     }
@@ -352,6 +424,34 @@ function loggedIn(uName)
     document.getElementById("signin").style.display = "none"
     document.getElementById("logout").style.display = "block"
     document.getElementById("logouthref").setAttribute("href", "admin")
+}
+
+function showTestUpdateform (testName)
+{
+    document.getElementById("createTestHeading").style.display = "none"
+    document.getElementById("createTest").style.display = "none"
+    socket.emit("showTestList", testName)
+    document.getElementById("testForm").style.display = "block"
+    document.getElementById("addTest").innerHTML = "Update"
+    document.getElementById("cancel").style.display = "block"
+    document.getElementById("deleteTest").style.display = "block"
+}
+
+function revertTestForm()
+{
+    for(let i = 0; i < 9; i++)
+    {
+        document.getElementById("input1"+i).value = ""
+    }
+    document.getElementById("createTestHeading").style.display = "block"
+    document.getElementById("createTest").style.display = "block"
+    document.getElementById("testForm").style.display = "none"
+    document.getElementById("addTest").innerHTML = "Add Test"
+    document.getElementById("addTest").onclick = ()=>{
+        validateAll()
+    }
+    document.getElementById("cancel").style.display = "none"
+    document.getElementById("deleteTest").style.display = "none"
 }
 
 socket.on("adminLoggedIn", (data, data1)=>{
@@ -556,6 +656,30 @@ socket.on("deleted", ()=>{
     updateList();
 })
 
+socket.on("noOfParticipants", (n, id)=>{
+    document.getElementById(id+"num").innerHTML = n
+    console.log(flag[id.valueOf()])
+    if(flag[id.valueOf()])
+    {
+        // document.getElementById(id+"Participants").style.display = "block"
+        // document.getElementById(id+"num").style.display = "block"
+        $("#"+id+"Participants").slideDown("slow");
+        $("#"+id+"num").slideDown("slow");  
+        flag[id.valueOf()] = false  
+        console.log("works1 " + id)            
+    }
+    else
+    {
+        $("#"+id+"Participants").slideUp("slow");
+        $("#"+id+"num").slideUp("slow");  
+        // document.getElementById(id+"Participants").style.display = "none"
+        // document.getElementById(id+"num").style.display = "none"
+        flag[id.valueOf()] = true
+        console.log("works2 " + id)
+    }
+    
+})
+
 socket.on("numberOfQuestion", (id, n)=>{
     let dropdown = document.getElementById("dropdown"+id)
     for(let i = 0; i < n; i++)
@@ -590,6 +714,81 @@ socket.on("alreadyLoggedIn", ()=>{
         footer.appendChild(useHere)
         once2 = false
     }
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
+})
+
+socket.on("showTestList", (test)=>{
+    let ogvalues = new Array(9)
+    let newValues = new Array(9)
+    ogvalues[0] = document.getElementById("input10").value = test.testName
+    ogvalues[1] = document.getElementById("input11").value = test.date
+    ogvalues[2] = document.getElementById("input12").value = test.startTime
+    ogvalues[3] = document.getElementById("input13").value = test.timeFrom
+    ogvalues[4] = document.getElementById("input14").value = test.description
+    ogvalues[5] = document.getElementById("input15").value = test.noofquestions[0]
+    ogvalues[6] = document.getElementById("input16").value = test.noofquestions[1]
+    ogvalues[7] = document.getElementById("input17").value = test.noofquestions[2]
+    ogvalues[8] = document.getElementById("input18").value = test.testTime
+    document.getElementById("addTest").onclick = ()=>{
+        document.getElementById("modal-title").innerHTML = "wait";
+        let text = "Updating test please wait"
+        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        $('#modal').modal('toggle');
+        document.getElementById(test.testName).style.display="none"
+        for(let i = 0; i < 9; i++)
+        {
+            if(ogvalues[i] != document.getElementById("input1"+i).value)
+            {
+                newValues[i] = document.getElementById("input1"+i).value
+            }
+            else
+            {
+                newValues[i] = ""
+            }
+        }
+        validateAll2(test.testName)
+    }
+    document.getElementById("deleteTest").onclick = ()=>{
+        document.getElementById("modal-title").innerHTML = "wait";
+        let text = "Deleting test please wait"
+        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        $('#modal').modal('toggle');
+        socket.emit("deleteTest", test.testName)
+    }
+})
+
+socket.on("testUpdated", ()=>{
+    document.getElementById("modal-title").innerHTML = "Success";
+    document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully Updated the test</p>';
+    let timeOut = setTimeout(() => {
+        $('#modal').modal('toggle');
+    }, 2000);
+    $('#modal').on('hidden.bs.modal', function (e) {
+        clearInterval(timeOut)
+    })
+    let testTime = document.getElementById("input18").value
+    if(testTime > 60)
+    {
+        testTime = Math.floor(testTime/60)+" hr "+ Math.floor(testTime%60)+" mins"
+    }
+    else
+    {
+        testTime = testTime + " mins"
+    }
+    let cardDate = [document.getElementById("input10").value, document.getElementById("input14").value, true, document.getElementById("input11").value, document.getElementById("input12").value, document.getElementById("input13").value, testTime]
+    placeTestCards(cardDate)
+    revertTestForm()
+})
+
+socket.on("testDeleted", (testName)=>{
+    document.getElementById(testName).style.display = "none"
+    document.getElementById("modal-title").innerHTML = "Success";
+    document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully Deleted the test</p>';
     let timeOut = setTimeout(() => {
         $('#modal').modal('toggle');
     }, 2000);

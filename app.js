@@ -390,10 +390,10 @@ io.on('connection', function(socket){
         socket.emit("deleted");
     })
 
-    socket.on("noOfParticipants", async (tName)=>{
-        let test = await Tests.findOne({"testName": tName}) 
+    socket.on("noOfParticipants", async (d)=>{
+        let test = await Tests.findOne({"testName": d.testName}) 
         //console.log(test.participants.length)
-        socket.emit("noOfParticipants", test.participants.length)
+        socket.emit("noOfParticipants", test.participants.length, d.id)
     })
 
     socket.on("numberOfQuestion", async (id)=>{
@@ -588,6 +588,50 @@ io.on('connection', function(socket){
                 break
             }
         }
+    })
+
+    socket.on("showTestList", async (testName)=>{
+        let test = await Tests.findOne({"testName":testName})
+        socket.emit("showTestList", test)
+    })
+
+    socket.on("updateTest", async (d)=>{
+        let test = await Tests.findOne({"testName":d.testName})
+        // let schemaKeys = Object.keys(test.toObject());
+        // console.log(schemaKeys[0])
+        // for(let i = 0; i < (schemaKeys.length - 1); i++)
+        // {
+        //     if(_testData[i] != "")
+        //     {
+        //         test.schemaKeys[i] = _testData[i]
+        //         console.log(test.schemaKeys[i]+ "  " + _testData[i])
+        //     }
+        // }
+        if(d.listofInputs[0] != "")
+            test.testName = d.listofInputs[0]
+        if(d.listofInputs[1] != "")
+            test.date = d.listofInputs[1]
+        if(d.listofInputs[2] != "")
+            test.startTime = d.listofInputs[2]
+        if(d.listofInputs[3] != "")
+            test.timeFrom = d.listofInputs[3]
+        if(d.listofInputs[4] != "")
+            test.description = d.listofInputs[4]
+        if(d.listofInputs[5] != "")
+            test.noofquestions[0] = d.listofInputs[5]
+        if(d.listofInputs[6] != "")
+            test.noofquestions[1] = d.listofInputs[6]
+        if(d.listofInputs[7] != "")
+            test.noofquestions[2] = d.listofInputs[7]
+        if(d.listofInputs[8] != "")
+            test.testTime = d.listofInputs[8]
+        await test.save()
+        socket.emit("testUpdated")
+    })
+
+    socket.on("deleteTest", async (testName)=>{
+        await Tests.findOneAndDelete({"testName":testName})
+        socket.emit("testDeleted", testName)
     })
 
     socket.on("disconnect", async ()=>{
