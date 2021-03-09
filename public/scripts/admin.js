@@ -5,7 +5,36 @@ listofInputs = ["", "", "", "", "", "", "", "", ""];
 
 var peer
 
+// PEER JS STUFF
 
+
+
+peer = new Peer(["Admin"], {config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
+peer.on('open', function(id) {
+    peer.on('connection', function(conn) {
+        conn.on('open', function() {
+            console.log("connected to " + conn.peer)
+            peer.on('call', function(call) {
+                call.on('stream', function(stream) {
+                    console.log("stream incoming")
+                    document.getElementById("videopl").srcObject  = stream
+                  });
+              });
+        });
+        conn.on('close', function() {
+            console.log("disconnected with " + conn.peer)
+        });
+    });
+});
+peer.on('close', function(){
+    console.log("disconnected with ")
+})
+
+
+
+
+
+// PEER JS STUFF
 
 function tryLogin()
 {
@@ -170,7 +199,6 @@ function validateAll2(testName)
     
 }
 
-
 function placeTestCards(data)
 {
     //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time 6= testDuration
@@ -212,6 +240,30 @@ function placeTestCards(data)
     div1.appendChild(div3)
     if(data[2])
     {
+        let proctor = document.createElement('button')
+        proctor.setAttribute("type", "button")
+        proctor.setAttribute("class", "btn btn-outline-success")
+        var d = new Date(),
+            h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+            m = (d.getMinutes() < 10 ? '0' : '') + (d.getMinutes()+1);
+        var time = h + ':' + m;
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        var yyyy = today.getFullYear();
+        today = dd + '/' + mm + '/' + yyyy;
+        if(time >= data[4] && today == data[3])
+        {
+            proctor.disabled = false
+        }
+        else
+        {
+            proctor.disabled = true
+        }
+        proctor.onclick = ()=>{
+            showProctor(data)
+        }
+        proctor.appendChild(document.createTextNode('proctor'))
         let editTest = document.createElement('button')
         editTest.setAttribute("type", "button")
         editTest.setAttribute("class", "btn btn-outline-success")
@@ -219,18 +271,16 @@ function placeTestCards(data)
             showTestUpdateform(data[0])
         }
         editTest.appendChild(document.createTextNode('edit test'))
-        let test = document.createElement('button')
+        let testDetails = document.createElement('button')
         let newLink=data[0].replace(/\s+/g, '')
-        test.setAttribute("id", newLink+"details")
-        test.setAttribute("type", "button")
-        test.setAttribute("class", "btn btn-outline-info")
-        test.onclick = ()=>{
+        testDetails.setAttribute("id", newLink+"details")
+        testDetails.setAttribute("type", "button")
+        testDetails.setAttribute("class", "btn btn-outline-info")
+        testDetails.onclick = ()=>{
             //document.getElementById(newLink+"Participants").style.display = "block";
             socket.emit("noOfParticipants", {testName:data[0], id:newLink})
         }
-        test.appendChild(document.createTextNode('view details'))
-        div1.appendChild(editTest);
-        div1.appendChild(test);
+        testDetails.appendChild(document.createTextNode('view details'))
         let participants = document.createElement('div')
         participants.setAttribute("id", newLink+"Participants")
         participants.setAttribute("style", "display:none;")
@@ -240,6 +290,9 @@ function placeTestCards(data)
         participants2.setAttribute("id", newLink+"num")
         participants2.setAttribute("style", "display:none;")
         participants2.setAttribute("class", "text-center")
+        div1.appendChild(proctor);
+        div1.appendChild(editTest);
+        div1.appendChild(testDetails);
         div1.appendChild(participants2)
     }
     testList.appendChild(div1)
@@ -453,6 +506,12 @@ function revertTestForm()
     document.getElementById("deleteTest").style.display = "none"
 }
 
+function showProctor(data)
+{
+    document.getElementById("container-1").style.display = "none"
+    document.getElementById("container-2").style.display = "block"
+}
+
 socket.on("adminLoggedIn", (data, data1)=>{
     document.getElementById("input0").classList.remove("is-invalid");
     document.getElementById("input0").classList.add("is-valid");
@@ -488,27 +547,7 @@ socket.on("adminLoggedIn", (data, data1)=>{
     }
 
 
-    // PEER JS STUFF
-
-
-
-    peer = new Peer(["Admin"], {config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
-    peer.on('open', function(id) {
-        peer.on('connection', function(conn) {
-            conn.on('open', function() {
-                console.log("connected to " + conn.peer)
-            });
-            conn.on('close', function() {
-                console.log("disconnected with " + conn.peer)
-            });
-        });
-    });
-
-
-
-
     
-    // PEER JS STUFF
 });
 
 socket.on("adminLogInFailed", (data)=>{

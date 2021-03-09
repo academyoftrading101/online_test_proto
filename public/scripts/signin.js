@@ -1,17 +1,27 @@
 
 const socket = io.connect();
 
+var peer
 
-var peer = new Peer();
-peer.on('open', function(id) {
-    var conn = peer.connect('Admin');
-    conn.on('open', function() {
-        console.log("connected to admin")
-    });
-    conn.on('close', function() {
-        console.log("disconnected to admin")
-    });
-  });
+navigator.mediaDevices.getUserMedia({
+    video: true
+  }).then((_stream)=>{dopeer(_stream)}).catch(e => {alert(`getusermedia error ${e.name}`);})
+
+function dopeer(stream)
+{
+    peer = new Peer();
+    peer.on('open', function(id) {
+        var conn = peer.connect('Admin');
+        conn.on('open', function() {
+            console.log("connected to admin")
+            var call = peer.call('Admin',stream);
+        });
+        conn.on('close', function() {
+            console.log("disconnected to admin")
+        });
+      });
+}
+
 
 
 window.onunload = ()=>{socket.emit("logout", document.getElementById("input0").value, "")}

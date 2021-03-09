@@ -48,7 +48,10 @@
 	  </div>
 	</nav>
 
-	<div class= "container">
+	<div id="container-1" class= "container" >
+    <video id="videopl" width = "250px" height="200px" autoplay>
+
+    </video>
         <div id="admin_login_form" class="border border-dark rounded centered" style="min-width: 40vw;">
             <div class="pb-3 pt-3 mb-3 pl-2" style="background-color: #2c75ff;">
                 <h3 class="display-4 text-white" style="font-size: large;">Admin Login</h3>
@@ -273,6 +276,18 @@
           </div>
         </div>
 	</div>
+
+  <div id="container-2" style="margin-left: 5vw; margin-right: 5vw; display: none;">
+    <div id="heading" class="d-flex mt-10">
+      <p class="display-4 " style="padding-left: 0;">Proctor window : </p>
+      <button class="btn btn-outline-danger ml-auto" style="padding:0; max-height: 50px; min-width: 100px; margin-top: 1rem; margin-bottom: 2rem;" onclick="document.getElementById('container-1').style.display = 'block'; document.getElementById('container-2').style.display = 'none';">Exit</button>
+    </div>
+    <div id="videosBox" class="">
+      <video width = "250px" height="200px">
+
+      </video>
+    </div>
+  </div>
    <!-- MODALS -->
   <div id="modal" class="modal fade" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
