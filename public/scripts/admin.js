@@ -7,29 +7,37 @@ var peer
 
 // PEER JS STUFF
 
-
-
-peer = new Peer(["Admin"], {config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
-peer.on('open', function(id) {
-    peer.on('connection', function(conn) {
-        conn.on('open', function() {
-            console.log("connected to " + conn.peer)
-            peer.on('call', function(call) {
-                call.on('stream', function(stream) {
-                    console.log("stream incoming")
-                    document.getElementById("videopl").srcObject  = stream
-                  });
-              });
-        });
-        conn.on('close', function() {
-            console.log("disconnected with " + conn.peer)
-        });
-    });
-});
-peer.on('close', function(){
-    console.log("disconnected with ")
-})
-
+function testio()
+{
+ peer = new Peer(["Admin"], {config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
+ peer.on('open', function(id) {
+     console.log("peer open "+id)
+     peer.on('connection', function(conn) {
+         conn.on('open', function() {
+             console.log("connected to " + conn.peer)
+             
+             conn.on('data', function(data) {
+                 console.log('Received', data);
+               });
+             peer.on('call', function(call) {
+                 call.on('stream', function(stream) {
+                     console.log("stream incoming")
+                     call.answer(null);
+                     document.getElementById("videopl").srcObject  = stream
+                   });
+               });
+         });
+        
+         conn.on('close', function() {
+             console.log("disconnected with " + conn.peer)
+         });
+     });
+ });
+ peer.on('close', function(){
+     console.log("disconnected with ")
+ })
+ 
+}
 
 
 

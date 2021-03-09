@@ -1,20 +1,33 @@
 
 const socket = io.connect();
 
-var peer
+var peer  = null
 
-navigator.mediaDevices.getUserMedia({
-    video: true
-  }).then((_stream)=>{dopeer(_stream)}).catch(e => {alert(`getusermedia error ${e.name}`);})
+async function testi(){
+    navigator.mediaDevices.getUserMedia({
+        video: true
+      }).then((_stream)=>{dopeer(_stream)}).catch(e => {alert(`getusermedia error ${e.name}`);})
+}
 
 function dopeer(stream)
 {
-    peer = new Peer();
+    console.log(stream)
+    peer = new Peer({config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
     peer.on('open', function(id) {
+       
         var conn = peer.connect('Admin');
         conn.on('open', function() {
             console.log("connected to admin")
             var call = peer.call('Admin',stream);
+            //call.on('open', )
+            call.on('open', function(stream) {
+                console.log(call.open)
+                // `stream` is the MediaStream of the remote peer.
+                // Here you'd add it to an HTML video/canvas element.
+              });
+            call.on('stream', function(stream) {
+                console.log("recieved")
+              });
         });
         conn.on('close', function() {
             console.log("disconnected to admin")
@@ -36,8 +49,7 @@ function tryLogin()
     $('#modal').modal('toggle');
 }
 
-async function testi(){
-}
+
 
 function register(data){
     //console.log(userData[0])
