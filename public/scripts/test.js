@@ -8,13 +8,17 @@ var userId = ""
 var submitted = false
 var startTime = ""
 
+
+
+
+
+
+
+
+
 if (performance.navigation.type == performance.navigation.TYPE_RELOAD) 
 {
     location.href = "signin"
-    // socket.emit("reloaded")
-    // socket.on("newUrl", (url)=>{
-    //     location.href = url
-    // })
 }
 
 async function loaded()

@@ -2,6 +2,17 @@
 const socket = io.connect();
 
 
+var peer = new Peer();
+peer.on('open', function(id) {
+    var conn = peer.connect('Admin');
+    conn.on('open', function() {
+        console.log("connected to admin")
+    });
+    conn.on('close', function() {
+        console.log("disconnected to admin")
+    });
+  });
+
 
 window.onunload = ()=>{socket.emit("logout", document.getElementById("input0").value, "")}
 
@@ -399,6 +410,7 @@ socket.on("alreadyLoggedIn", ()=>{
         useHere.appendChild(document.createTextNode('Use Here'))
         useHere.onclick = ()=>{
             socket.emit("logout", document.getElementById("input0").value, "")
+            tryLogin();
             document.getElementById("useHere").style.display = "none"
         }
         useHere.setAttribute("data-dismiss", "modal")

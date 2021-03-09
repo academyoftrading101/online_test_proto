@@ -3,6 +3,10 @@ var listofInputs = new Array(9)
 listofInputs = ["", "", "", "", "", "", "", "", ""];
 
 
+var peer
+
+
+
 function tryLogin()
 {
     document.getElementById("modal-title").innerHTML = "wait";
@@ -481,8 +485,30 @@ socket.on("adminLoggedIn", (data, data1)=>{
         }
         let cardDate = [data1[i].testName, data1[i].description, true, data1[i].date, data1[i].startTime, data1[i].timeFrom, testTime]
         placeTestCards(cardDate)
-        
     }
+
+
+    // PEER JS STUFF
+
+
+
+    peer = new Peer(["Admin"], {config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
+    peer.on('open', function(id) {
+        peer.on('connection', function(conn) {
+            conn.on('open', function() {
+                console.log("connected to " + conn.peer)
+            });
+            conn.on('close', function() {
+                console.log("disconnected with " + conn.peer)
+            });
+        });
+    });
+
+
+
+
+    
+    // PEER JS STUFF
 });
 
 socket.on("adminLogInFailed", (data)=>{
