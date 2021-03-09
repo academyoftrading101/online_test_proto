@@ -24,7 +24,7 @@ async function loaded()
         let timerWorker = new Worker('/scripts/workers/timer.js');
         var d = new Date(),
             h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
-            m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+            m = (d.getMinutes() < 10 ? '0' : '') + (d.getMinutes()+1);
         var time = h + ':' + m;
         startTime = await getCookie("startTime")
         document.getElementById("timer2").innerHTML = startTime
@@ -32,7 +32,12 @@ async function loaded()
         timerWorker.onmessage = function (e) 
         {
             document.getElementById("continueButton").disabled = false
-            timerWorker.terminate()
+            // if(e.data == "count")
+            // {
+            //     document.getElementById("continueButton").onclick = null
+            //     document.getElementById("continueButton").disabled = true
+            //     timerWorker.terminate()
+            // }
         }
     }
 }

@@ -431,12 +431,11 @@ io.on('connection', function(socket){
     let index = -1
 
     socket.on("unregister", async(d)=>{
-        console.log("unregistering")
         let test = await Tests.findOne({"testName":d.testName})
-        //console.log(test)
+        //console.log(test+"    ===>before")
         for(let i = 0; test.participants.length; i++)
         {
-            if(test.participants.pid == d.uid)
+            if(test.participants[i].pid == d.uid)
             {
                 index = i
                 break
@@ -444,11 +443,14 @@ io.on('connection', function(socket){
         }
         test.participants.splice(index, 1)
         await test.save();
+        //console.log(test+"    ===>after")
         let user = await Users.findOne({"_id":d.uid})
         for(let i = 0; i < user.tests.length; i++)
         {
+            //console.log(i+" not if")
             if(user.tests[i].testName == d.testName)
             {
+                //console.log(i+"  if")
                 user.tests.splice(i, 1)
                 await user.save();
                 socket.emit("unregister", d.testName)
@@ -654,6 +656,32 @@ io.on('connection', function(socket){
             await users[i].save()
         }
         socket.emit("testDeleted", testName)
+    })
+
+    socket.on("confirmData", async d =>{
+        let allgood = false
+        let test = await Tests.findOne({"testName":d.testName})
+        for(let i = 0; i < test.participants.length; i++)
+        {
+            if(test.participants[i].pid == d.uid)
+            {
+                allgood = true
+                break
+            }
+        }
+        let user = await Users.findOne({"_id":d.uid})
+        for(let i = 0; i < user.tests.length; i++)
+        {
+            if(user.tests[i].testName == d.testName)
+            {
+                if(allgood)
+                {
+                    socket.emit("confirmData")
+                }
+                return
+            }
+        }
+        socket.emit("notConfirmData")
     })
 
     socket.on("disconnect", async ()=>{

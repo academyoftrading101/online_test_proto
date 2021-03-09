@@ -15,7 +15,7 @@ function tryLogin()
     $('#modal').modal('toggle');
 }
 
-function testi(){
+async function testi(){
 }
 
 function register(data){
@@ -43,6 +43,8 @@ function getCookie(cname) {
     }
     return "";
 }
+
+let late = false
 
 function placeTestCards(data)
 {
@@ -90,79 +92,107 @@ function placeTestCards(data)
     div3.appendChild(p5)
     if(!data[2])
     {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        var d = new Date(),
+            h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+            m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+        var time = h + ':' + m;
+
+
+        today = dd + '/' + mm + '/' + yyyy;
+        if (data[3] < today || data[4] < time) {
+            late = true
+        }
         let test = document.createElement('button')
-        test.setAttribute("id", "startTest")
+        test.setAttribute("id", "startTest"+data[0])
         test.setAttribute("type", "button")
         test.setAttribute("class", "btn btn-outline-success col-md-6")
-        if(data[7] && !data[9])
+        if(data[7] && !data[9] && !late)
         {
-            test.onclick = ()=>{
-                var today = new Date();
-                var dd = String(today.getDate()).padStart(2, '0');
-                var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                var yyyy = today.getFullYear();
+            
+            test.onclick = () => {
+                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0] })
+                document.getElementById("modal-title").innerHTML = "wait";
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Checking details please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
+                socket.on("confirmData", () => {
+                    $('#modal').modal('toggle');
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = today.getFullYear();
 
-                var d = new Date(),
-                h = (d.getHours()<10?'0':'') + d.getHours(),
-                m = (d.getMinutes()<10?'0':'') + d.getMinutes();
-                var time = h + ':' + m;
-                
+                    var d = new Date(),
+                        h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+                        m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+                    var time = h + ':' + m;
 
-                today = dd + '/' + mm + '/' + yyyy;
-                let date = data[3];
-                var token = getCookie("token"+userData[0]._id);
-                socket.emit("currentMACTest", {testName:data[0], user:token})
-                socket.on("currentMACTest", (result)=>{
-                    if(result)
-                    {
-                        //if(true)
-                        if(date == today && data[5] <= time && data[4] >= time)
-                        {
-                            var d = new Date();
-                            d.setTime(d.getTime() + (12 * 60 * 60 * 1000));
-                            var expires = "expires="+d.toUTCString();
-                            document.cookie = "testName="+data[0]+ ";" + expires
-                            document.cookie = "startTime="+data[4]+ ";" + expires
-                            document.cookie = "userId="+userData[0]._id+ ";" + expires
-                            let newUrl = "/"+data[0]
-                            newUrl = newUrl.replaceAll(/ /g,"%20")
-                            socket.emit("newUrl", newUrl)
-                            socket.on("newUrl", (url)=>{
-                                document.getElementById("modal-title").innerHTML = "wait";
-                                document.getElementById("modal-body").innerHTML = "starting test please wait";
-                                $('#modal').modal('toggle');
-                                let timeOut = setTimeout(() => {
+
+                    today = dd + '/' + mm + '/' + yyyy;
+                    let date = data[3];
+                    var token = getCookie("token" + userData[0]._id);
+                    socket.emit("currentMACTest", { testName: data[0], user: token })
+                    socket.on("currentMACTest", (result) => {
+                        if (result) {
+                            //if(true)
+                            if (date == today && data[5] <= time && data[4] >= time) {
+                                var d = new Date();
+                                d.setTime(d.getTime() + (12 * 60 * 60 * 1000));
+                                var expires = "expires=" + d.toUTCString();
+                                document.cookie = "testName=" + data[0] + ";" + expires
+                                document.cookie = "startTime=" + data[4] + ";" + expires
+                                document.cookie = "userId=" + userData[0]._id + ";" + expires
+                                let newUrl = "/" + data[0]
+                                newUrl = newUrl.replaceAll(/ /g, "%20")
+                                socket.emit("newUrl", newUrl)
+                                socket.on("newUrl", (url) => {
+                                    document.getElementById("modal-title").innerHTML = "wait";
+                                    document.getElementById("modal-body").innerHTML = "starting test please wait";
                                     $('#modal').modal('toggle');
-                                    location.href = url
-                                }, 2000);
-                                $('#modal').on('hidden.bs.modal', function (e) {
-                                    clearInterval(timeOut)
-                                    location.href = url
+                                    let timeOut = setTimeout(() => {
+                                        $('#modal').modal('toggle');
+                                        location.href = url
+                                    }, 2000);
+                                    $('#modal').on('hidden.bs.modal', function (e) {
+                                        clearInterval(timeOut)
+                                        location.href = url
+                                    })
+
                                 })
-                                
-                            })
+                            }
+                            else if (date < today || data[4] < time) {
+                                document.getElementById("modal-title").innerHTML = "failed";
+                                document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">you were late, cant attempt this test. try other tests if you like to </p>';
+                                $('#modal').modal('toggle');
+                            }
+                            else {
+                                document.getElementById("modal-title").innerHTML = "try later";
+                                document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">cant take this test right now. try on ' + data[3] + ' after ' + data[5] + '</p>';
+                                $('#modal').modal('toggle');
+                            }
                         }
-                        else if(data[4] < time && date == today)
-                        {
-                            document.getElementById("modal-title").innerHTML = "failed";
-                            document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">you were late, cant attempt this test. try other tests if you like to </p>';
+                        else {
+                            document.getElementById("modal-title").innerHTML = "Alert";
+                            document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">cant take this test on this device either switch to registered device or create a ticket to change device permission' + '</p>';
                             $('#modal').modal('toggle');
                         }
-                        else
-                        {
-                            document.getElementById("modal-title").innerHTML = "try later";
-                            document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">cant take this test right now. try on '+data[3]+' after '+data[5]+'</p>';
-                            $('#modal').modal('toggle');
-                        }
-                    }
-                    else
-                    {
-                        document.getElementById("modal-title").innerHTML = "Alert";
-                        document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">cant take this test on this device either switch to registered device or create a ticket to change device permission'+'</p>';
-                        $('#modal').modal('toggle');
-                    }
+                    })
                 })
-                
+                socket.on("notConfirmData", ()=>{
+                    test.setAttribute("disabled", true)
+                    document.getElementById("modal-title").innerHTML = "Failed";
+                    document.getElementById("modal-body").innerHTML = "Data is corrupted please unregister and register again for this test";
+                    let timeOut = setTimeout(() => {
+                        $('#modal').modal('toggle');
+                    }, 2000);
+                    $('#modal').on('hidden.bs.modal', function (e) {
+                        clearInterval(timeOut)
+                    })
+                })
             }
             test.appendChild(document.createTextNode("Take Test"))
             div3.appendChild(test);
@@ -174,31 +204,41 @@ function placeTestCards(data)
             }
             test.appendChild(document.createTextNode("register"))
             div3.appendChild(test);
-        }
-               
-        if(data[7] && !data[9])
+        }     
+        if(data[7] && !data[9] && !late)
         {
             let test2 = document.createElement('button')
-            test2.setAttribute("id", "startTest2")
+            test2.setAttribute("id", "unregister"+data[0])
             test2.setAttribute("type", "button")
             test2.setAttribute("class", "btn btn-outline-danger col-md-5 offset-md-1")
             test2.appendChild(document.createTextNode("unregister"))
             test2.onclick = ()=>{
+                document.getElementById("modal-title").innerHTML = "wait";
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Unregistering please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
                 socket.emit("unregister", {uid:userData[0]._id, testName:data[0]} )
-                console.log("unregistering")
             }
             div3.appendChild(test2);
         }
     }
     //div1.appendChild(div2)
     div1.appendChild(div3)
-    if(data[7] && data[9])
+    if(data[7])
         {
             let but = document.createElement('button')
+            but.setAttribute("id", "alert"+data[0])
             but.setAttribute("class", "btn btn-danger col-md-12")
             but.disabled = true
-            but.appendChild(document.createTextNode('Already Attempted !'))
-            div3.appendChild(but);
+            if(data[9])
+            {
+                but.appendChild(document.createTextNode('Already Attempted !'))
+                div3.appendChild(but);
+            }
+            else if(late)
+            {
+                but.appendChild(document.createTextNode('you missed it'))
+                div3.appendChild(but);
+            }
         }
     testList.appendChild(div1)
 }
@@ -224,7 +264,6 @@ function loggedIn(uName)
 
 socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     userData = data;
-    
     document.getElementById("input0").classList.remove("is-invalid");
     document.getElementById("input0").classList.add("is-valid");
     document.getElementById("input1").classList.remove("is-invalid");
@@ -261,7 +300,7 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     for(let i = 0; i<myTestsData.length; i++)
     {
         for(let j = 0; j < myTestsData[i].participants.length; j++){
-            console.log(myTestsData[i].participants[j].attempted)
+            //console.log(myTestsData[i].participants[j].attempted)
             if(myTestsData[i].participants[j].pid == userData[0]._id)
             {
                 attempted = myTestsData[i].participants[j].attempted

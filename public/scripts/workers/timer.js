@@ -31,7 +31,18 @@ onmessage = function(e) {
             {
                 postMessage("startTest");
                 clearInterval(x);
-                return;
+                
+                // let count = 60
+                // let x2 = setInterval(() => {
+                //     postMessage(count);
+                //     count--
+                //     if (count == 0) {
+                //         clearInterval(x2);
+                //         postMessage("count");
+                //         return;
+                //     }
+                // }, 1000)
+                return
             }
         }, 1000);
     }
