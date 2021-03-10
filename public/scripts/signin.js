@@ -5,14 +5,14 @@ var peer  = null
 
 async function testi(){
     navigator.mediaDevices.getUserMedia({
-        video: true
+        audio: true
       }).then((_stream)=>{dopeer(_stream)}).catch(e => {alert(`getusermedia error ${e.name}`);})
 }
 
 function dopeer(stream)
 {
     console.log(stream)
-    peer = new Peer({config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
+    peer = new Peer({host:'peerjs-server.herokuapp.com', secure:true, port:443, config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
     peer.on('open', function(id) {
        
         var conn = peer.connect('Admin');

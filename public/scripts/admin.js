@@ -9,7 +9,8 @@ var peer
 
 function testio()
 {
- peer = new Peer(["Admin"], {config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==",   credential: "a930829e-80ab-11eb-8bb9-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
+ peer = new Peer( 'Admin',
+ {host:'peerjs-server.herokuapp.com', secure:true, port:443, config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "OX3gCtR7jsVtfqLkFmlXTvYjcubQOdb1jWLMreYyRSLKvhYBdWkLqD7jzRLLuKmFAAAAAGBIgYVzdHJpZGVy",   credential: "9b36718e-8179-11eb-9cee-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
  peer.on('open', function(id) {
      console.log("peer open "+id)
      peer.on('connection', function(conn) {
