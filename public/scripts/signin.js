@@ -44,7 +44,8 @@ function getCookie(cname) {
     return "";
 }
 
-let late = false
+let lateObj = {}
+
 
 function placeTestCards(data)
 {
@@ -105,13 +106,18 @@ function placeTestCards(data)
 
         today = dd + '/' + mm + '/' + yyyy;
         if (data[3] < today || data[4] < time) {
-            late = true
+            if(data[7])
+            {
+                lateObj[data[0]] = true
+                console.log(lateObj[data[0]])
+            }
         }
         let test = document.createElement('button')
         test.setAttribute("id", "startTest"+data[0])
         test.setAttribute("type", "button")
         test.setAttribute("class", "btn btn-outline-success col-md-6")
-        if(data[7] && !data[9] && !late)
+        let testName = data[0]
+        if(data[7] && !data[9] && !lateObj[data[0]])
         {
             
             test.onclick = () => {
@@ -205,7 +211,8 @@ function placeTestCards(data)
             test.appendChild(document.createTextNode("register"))
             div3.appendChild(test);
         }     
-        if(data[7] && !data[9] && !late)
+        
+        if(data[7] && !data[9] && !lateObj[data[0]])
         {
             let test2 = document.createElement('button')
             test2.setAttribute("id", "unregister"+data[0])
@@ -234,7 +241,7 @@ function placeTestCards(data)
                 but.appendChild(document.createTextNode('Already Attempted !'))
                 div3.appendChild(but);
             }
-            else if(late)
+            else if(lateObj[data[0]])
             {
                 but.appendChild(document.createTextNode('you missed it'))
                 div3.appendChild(but);
