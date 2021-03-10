@@ -9,31 +9,35 @@ var peer
 
 function testio()
 {
- peer = new Peer( 'Admin',
+ peer = new Peer('Admin', 
  {host:'peerjs-server.herokuapp.com', secure:true, port:443, config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "OX3gCtR7jsVtfqLkFmlXTvYjcubQOdb1jWLMreYyRSLKvhYBdWkLqD7jzRLLuKmFAAAAAGBIgYVzdHJpZGVy",   credential: "9b36718e-8179-11eb-9cee-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
- peer.on('open', function(id) {
-     console.log("peer open "+id)
-     peer.on('connection', function(conn) {
-         conn.on('open', function() {
-             console.log("connected to " + conn.peer)
-             
-             conn.on('data', function(data) {
-                 console.log('Received', data);
-               });
-             peer.on('call', function(call) {
-                 call.on('stream', function(stream) {
-                     console.log("stream incoming")
-                     call.answer(null);
-                     document.getElementById("videopl").srcObject  = stream
-                   });
-               });
-         });
+    peer.on('open', function (id) {
+        console.log("peer open " + id)
+        document.getElementById("testtest").onclick = ()=>{
+            socket.emit("yolo", id)
+        }
         
-         conn.on('close', function() {
-             console.log("disconnected with " + conn.peer)
-         });
-     });
- });
+        peer.on('connection', function (conn) {
+            conn.on('open', function () {
+                console.log("connected to " + conn.peer)
+                peer.on('call', function (call) {
+                    call.answer(null);
+                    call.on('stream', function (stream) {
+                        console.log("stream incoming")
+                        
+                        document.getElementById("videopl").srcObject = stream
+                    });
+                });
+                conn.on('data', function (data) {
+                    console.log('Received', data);
+                });
+            });
+
+            conn.on('close', function () {
+                console.log("disconnected with " + conn.peer)
+            });
+        });
+    });
  peer.on('close', function(){
      console.log("disconnected with ")
  })

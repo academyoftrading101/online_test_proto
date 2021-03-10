@@ -684,6 +684,10 @@ io.on('connection', function(socket){
         socket.emit("notConfirmData")
     })
 
+    socket.on("yolo", id=>{
+        io.sockets.emit("yolo", id)
+    })
+
     socket.on("disconnect", async ()=>{
         try{
             if(SOCKET_LIST[socket.id].isAdmin)

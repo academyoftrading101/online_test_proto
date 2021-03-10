@@ -7,7 +7,7 @@
     <title>Admin</title>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 </head>
-<body onload="testio()">
+<body>
 	
 	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/5c50a4aeb8.js" crossorigin="anonymous"></script>
@@ -49,232 +49,250 @@
 	</nav>
 
 	<div id="container-1" class= "container" >
+    <button onclick="testio()">test</button>
+    <button id="testtest">test</button>
     <video id="videopl" width = "250px" height="200px" autoplay>
 
     </video>
-        <div id="admin_login_form" class="border border-dark rounded centered" style="min-width: 40vw;">
-            <div class="pb-3 pt-3 mb-3 pl-2" style="background-color: #2c75ff;">
-                <h3 class="display-4 text-white" style="font-size: large;">Admin Login</h3>
-            </div>
-            <form>
-                <div class="form-group row pl-2">
-                  <label for="input0" class="col-sm-2 col-form-label">Email</label>
-                  <div class="col-sm-8">
-                    <input type="email" class="form-control" id="input0">
-                    <div id="invalid0" class="invalid-feedback"></div>
-                  </div>
-                </div>
-                <div class="form-group row pl-2">
-                  <label for="input1" class="col-sm-2 col-form-label">Password</label>
-                  <div class="col-sm-6">
-                    <input type="password" class="form-control" id="input1">
-                    <div id="invalid1" class="invalid-feedback"></div>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <div class="col-sm-10">
-                    <button type="button" class="btn btn-primary mt-2 ml-2" onclick="tryLogin()">Sign in</button>
-                  </div>
-                </div>
-            </form>
-        </div>
-        <div class="text-center mt-10">
-          <h3 class="mt-10 display-4" id="welcome-msg"></h3>
-        </div>
-        <div id="questionBank" class="mt-5" style="display:none">
-          <h3 class="mt-10 display-4">Question Bank :</h3>
-            <button class="btn btn-outline-success ml-2 mt-5 mb-5" onclick='slide("viewQuestionsOptions"); slide("questions"); slide2("questionUpdateField");  slide2("questionField");slide2("updateSearch");'> View Questions </button>
-            <button class="btn btn-outline-success ml-2 mt-5 mb-5" onclick='slide("questionField"); slide2("viewQuestionsOptions"); slide2("questionUpdateField");  slide2("questions");slide2("updateSearch");'> Add Questions </button>  
-            <button class="btn btn-outline-success ml-2 mt-5 mb-5" onclick='slide("updateSearch"); slide2("questionUpdateField"); slide2("viewQuestionsOptions"); slide2("questions"); slide2("questionField"); updateList();'> Update Questions </button>
-            <div id="viewQuestionsOptions" style="display: none;">
-              <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion0" onclick="showQuestions(0); //slide('questions')"> Easy Questions </button>
-              <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion1" onclick="showQuestions(1); //slide('questions')"> Medium Questions </button>
-              <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion2" onclick="showQuestions(2); //slide('questions')"> Hard Questions </button>
-              <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion3" onclick="showQuestions(3); //slide('questions')"> All Questions </button>
-            </div>
-            <div id="questions" class="mt-4" style="display: none;">
-              <ul id="questions0" class="list-group">
-              </ul>
-            </div>
-            <div id="questionField" class="justify-content-center mb-10 row mt-10 ml-2" style="display: none;">
-              <div  class="border border-dark rounded col-md-10" style="max-width: 70vw; padding: 0 !important;">
-                <ul class="list-group">
-                  <li class="list-group-item" style="max-width: 80vw;">
-                    <label for="input30">Question</label>
-                    <textarea class="form-control mb-4" id="input30" rows="3"></textarea>
-                    <label for="input31">option 1</label>
-                    <textarea class="form-control mb-3" id="input31" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input32">option 2</label>
-                    <textarea class="form-control mb-3" id="input32" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input33">option 3</label>
-                    <textarea class="form-control mb-3" id="input33" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input34">option 4</label>
-                    <textarea class="form-control mb-3" id="input34" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input38">Correct Answer</label>
-                    <textarea class="form-control mb-3" id="input38" rows="1" style="max-width: 300px;" placeholder="enter correct option number"></textarea>
-                    <label for="raido">Question type</label>
-                    <div class="form-check" id="raido">
-                      <input class="form-check-input" type="radio" name="difficulty" id="input35" value="option1" checked>
-                      <label class="form-check-label" for="input35">
-                        Easy Question
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="difficulty" id="input36" value="option1" >
-                      <label class="form-check-label" for="input36">
-                        Medium Question
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="difficulty" id="input37" value="option1" >
-                      <label class="form-check-label" for="input37">
-                        Hard Question
-                      </label>
-                    </div>
-                  </li>
-                </ul>
-                <button class="btn btn-outline-success ml-2 mb-3 mt-3" onclick="nextQuestion()"> Add Question </button>
-              </div> 
-            </div>
-            <div id="updateSearch" class="mt-4" style="display: none;">
-              <ul id="questions1" class="list-group">
-              </ul>
-            </div>
-            <div id="questionUpdateField" class="justify-content-center mb-10 row mt-10 ml-2" style="display: none;">
-              <div  class="border border-dark rounded col-md-10" style="max-width: 70vw; padding: 0 !important;">
-                <ul class="list-group">
-                  <li class="list-group-item" style="max-width: 80vw;">
-                    <label for="input40">Question</label>
-                    <textarea class="form-control mb-4" id="input40" rows="3"></textarea>
-                    <label for="input41">option 1</label>
-                    <textarea class="form-control mb-3" id="input41" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input42">option 2</label>
-                    <textarea class="form-control mb-3" id="input42" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input43">option 3</label>
-                    <textarea class="form-control mb-3" id="input43" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input44">option 4</label>
-                    <textarea class="form-control mb-3" id="input44" rows="1" style="max-width: 300px;"></textarea>
-                    <label for="input45">Correct Ans</label>
-                    <textarea class="form-control mb-3" id="input45" rows="1" style="max-width: 300px;"></textarea>
-                    <div id="invalid45" class="invalid-feedback"></div>
-                    <label for="raido">Question type</label>
-                    <div class="form-check" id="raido">
-                      <input class="form-check-input" type="radio" name="difficulty" id="input46" value="option1" checked>
-                      <label class="form-check-label" for="input46">
-                        Easy Question
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="difficulty" id="input47" value="option1" >
-                      <label class="form-check-label" for="input47">
-                        Medium Question
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="difficulty" id="input48" value="option1" >
-                      <label class="form-check-label" for="input48">
-                        Hard Question
-                      </label>
-                    </div>
-                  </li>
-                </ul>
-                <button id="updateButton" class="btn btn-outline-success ml-2 mb-3 mt-3" onclick="">Update Question</button>
-              </div> 
-            </div>
-        </div>
-        <div id="upcoming-tests" class="mt-5" style="display:none">
-          <h3 class="mt-5 display-4">Upcoming Tests :</h3>
-          <div id="tests" class="mt-4 row d-flex inline-flex" style="display:none">
+    <div id="admin_login_form" class="border border-dark rounded centered" style="min-width: 40vw;">
+      <div class="pb-3 pt-3 mb-3 pl-2" style="background-color: #2c75ff;">
+        <h3 class="display-4 text-white" style="font-size: large;">Admin Login</h3>
+      </div>
+      <form>
+        <div class="form-group row pl-2">
+          <label for="input0" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-8">
+            <input type="email" class="form-control" id="input0">
+            <div id="invalid0" class="invalid-feedback"></div>
           </div>
-          <h3 id="createTestHeading" class="mt-10 display-4">Create a Test :</h3>
-          <button id="createTest" type="button" class="btn btn-outline-success mt-4" onclick="createTest();">Create Test</button>
-          <div class="justify-content-center mb-10 row mt-10">
-            <div id="testForm" class="border border-dark rounded col-md-10" style="max-width: 70vw; padding: 0 !important; display: none;">
-              <div class="pb-3 pt-3 mb-3 pl-2" style="background-color: #2c75ff;">
-                <h3 class="display-4 text-white" style="font-size: large;">Fill the form</h3>
+        </div>
+        <div class="form-group row pl-2">
+          <label for="input1" class="col-sm-2 col-form-label">Password</label>
+          <div class="col-sm-6">
+            <input type="password" class="form-control" id="input1">
+            <div id="invalid1" class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-10">
+            <button type="button" class="btn btn-primary mt-2 ml-2" onclick="tryLogin()">Sign in</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="text-center mt-10">
+      <h3 class="mt-10 display-4" id="welcome-msg"></h3>
+    </div>
+    <div id="questionBank" class="mt-5" style="display:none">
+      <h3 class="mt-10 display-4">Question Bank :</h3>
+      <button class="btn btn-outline-success ml-2 mt-5 mb-5"
+        onclick='slide("viewQuestionsOptions"); slide("questions"); slide2("questionUpdateField");  slide2("questionField");slide2("updateSearch");'>
+        View Questions </button>
+      <button class="btn btn-outline-success ml-2 mt-5 mb-5"
+        onclick='slide("questionField"); slide2("viewQuestionsOptions"); slide2("questionUpdateField");  slide2("questions");slide2("updateSearch");'>
+        Add Questions </button>
+      <button class="btn btn-outline-success ml-2 mt-5 mb-5"
+        onclick='slide("updateSearch"); slide2("questionUpdateField"); slide2("viewQuestionsOptions"); slide2("questions"); slide2("questionField"); updateList();'>
+        Update Questions </button>
+      <div id="viewQuestionsOptions" style="display: none;">
+        <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion0"
+          onclick="showQuestions(0); //slide('questions')"> Easy Questions </button>
+        <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion1"
+          onclick="showQuestions(1); //slide('questions')"> Medium Questions </button>
+        <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion2"
+          onclick="showQuestions(2); //slide('questions')"> Hard Questions </button>
+        <button class="btn btn-outline-success ml-2 mb-2" id="viewQuestion3"
+          onclick="showQuestions(3); //slide('questions')"> All Questions </button>
+      </div>
+      <div id="questions" class="mt-4" style="display: none;">
+        <ul id="questions0" class="list-group">
+        </ul>
+      </div>
+      <div id="questionField" class="justify-content-center mb-10 row mt-10 ml-2" style="display: none;">
+        <div class="border border-dark rounded col-md-10" style="max-width: 70vw; padding: 0 !important;">
+          <ul class="list-group">
+            <li class="list-group-item" style="max-width: 80vw;">
+              <label for="input30">Question</label>
+              <textarea class="form-control mb-4" id="input30" rows="3"></textarea>
+              <label for="input31">option 1</label>
+              <textarea class="form-control mb-3" id="input31" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input32">option 2</label>
+              <textarea class="form-control mb-3" id="input32" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input33">option 3</label>
+              <textarea class="form-control mb-3" id="input33" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input34">option 4</label>
+              <textarea class="form-control mb-3" id="input34" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input38">Correct Answer</label>
+              <textarea class="form-control mb-3" id="input38" rows="1" style="max-width: 300px;"
+                placeholder="enter correct option number"></textarea>
+              <label for="raido">Question type</label>
+              <div class="form-check" id="raido">
+                <input class="form-check-input" type="radio" name="difficulty" id="input35" value="option1" checked>
+                <label class="form-check-label" for="input35">
+                  Easy Question
+                </label>
               </div>
-              <form>
-                  <div class="form-group row pl-2">
-                    <label for="input10" class="col-sm-4 col-form-label">Test Name :</label>
-                    <div class="col-sm-6">
-                      <input type="text" class="form-control" id="input10" placeholder="enter test name">
-                      <div id="invalid10" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input14" class="col-sm-4 col-form-label">Test Description :</label>
-                    <div class="col-sm-7">
-                      <input type="text" class="form-control" id="input14">
-                      <div id="invalid14" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input11" class="col-sm-4 col-form-label">date of test :</label>
-                    <div class="col-sm-6">
-                      <input type="text" name="date" class="form-control datepicker" autocomplete="off" id="input11">
-                      <script type="text/javascript">
-                        $('.datepicker').datepicker({
-                            format: 'dd/mm/yyyy',
-                            startDate: new Date()
-                        });
-                      </script>
-                      <div id="invalid11" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input12" class="col-sm-4 col-form-label">test starts at :</label>
-                    <div class="col-sm-6">
-                      <input type="time" class="form-control" id="input12">
-                      <div id="invalid12" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input13" class="col-sm-4 col-form-label">Login at :</label>
-                    <div class="col-sm-6">
-                      <input type="time" class="form-control d-inline-flex" id="input13" style="max-width: 170px;">
-                      <div id="invalid13" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input15" class="col-sm-4 col-form-label">no. of Easy Questions :</label>
-                    <div class="col-sm-7">
-                      <input type="text" class="form-control" id="input15">
-                      <div id="invalid15" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input16" class="col-sm-4 col-form-label">no. of Medium Questions :</label>
-                    <div class="col-sm-7">
-                      <input type="text" class="form-control" id="input16">
-                      <div id="invalid16" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input17" class="col-sm-4 col-form-label">no. of Hard Questions :</label>
-                    <div class="col-sm-7">
-                      <input type="text" class="form-control" id="input17">
-                      <div id="invalid17" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row pl-2">
-                    <label for="input18" class="col-sm-4 col-form-label">duration of test :</label>
-                    <div class="col-sm-7">
-                      <input type="text" class="form-control" id="input18" placeholder="enter test duration in minutes">
-                      <div id="invalid18" class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <div class="col-md-12 d-flex inline-flex">
-                      <button type="button" id="addTest" class="btn btn-success mt-2 ml-2" onclick="validateAll()">Add Test</button>
-                      <button type="button" id="cancel" class="btn btn-secondary mt-2 ml-2 mr-auto" style="display: none;" onclick="revertTestForm()">Cancel</button>
-                      <button type="button" id="deleteTest" class="btn btn-danger mt-2 mr-2 float-right" style="display: none;" >Delete Test</button>
-                    </div>
-                  </div>
-              </form>            
-            </div>
-            
-          </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="difficulty" id="input36" value="option1">
+                <label class="form-check-label" for="input36">
+                  Medium Question
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="difficulty" id="input37" value="option1">
+                <label class="form-check-label" for="input37">
+                  Hard Question
+                </label>
+              </div>
+            </li>
+          </ul>
+          <button class="btn btn-outline-success ml-2 mb-3 mt-3" onclick="nextQuestion()"> Add Question </button>
         </div>
+      </div>
+      <div id="updateSearch" class="mt-4" style="display: none;">
+        <ul id="questions1" class="list-group">
+        </ul>
+      </div>
+      <div id="questionUpdateField" class="justify-content-center mb-10 row mt-10 ml-2" style="display: none;">
+        <div class="border border-dark rounded col-md-10" style="max-width: 70vw; padding: 0 !important;">
+          <ul class="list-group">
+            <li class="list-group-item" style="max-width: 80vw;">
+              <label for="input40">Question</label>
+              <textarea class="form-control mb-4" id="input40" rows="3"></textarea>
+              <label for="input41">option 1</label>
+              <textarea class="form-control mb-3" id="input41" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input42">option 2</label>
+              <textarea class="form-control mb-3" id="input42" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input43">option 3</label>
+              <textarea class="form-control mb-3" id="input43" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input44">option 4</label>
+              <textarea class="form-control mb-3" id="input44" rows="1" style="max-width: 300px;"></textarea>
+              <label for="input45">Correct Ans</label>
+              <textarea class="form-control mb-3" id="input45" rows="1" style="max-width: 300px;"></textarea>
+              <div id="invalid45" class="invalid-feedback"></div>
+              <label for="raido">Question type</label>
+              <div class="form-check" id="raido">
+                <input class="form-check-input" type="radio" name="difficulty" id="input46" value="option1" checked>
+                <label class="form-check-label" for="input46">
+                  Easy Question
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="difficulty" id="input47" value="option1">
+                <label class="form-check-label" for="input47">
+                  Medium Question
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="difficulty" id="input48" value="option1">
+                <label class="form-check-label" for="input48">
+                  Hard Question
+                </label>
+              </div>
+            </li>
+          </ul>
+          <button id="updateButton" class="btn btn-outline-success ml-2 mb-3 mt-3" onclick="">Update Question</button>
+        </div>
+      </div>
+    </div>
+    <div id="upcoming-tests" class="mt-5" style="display:none">
+      <h3 class="mt-5 display-4">Upcoming Tests :</h3>
+      <div id="tests" class="mt-4 row d-flex inline-flex" style="display:none">
+      </div>
+      <h3 id="createTestHeading" class="mt-10 display-4">Create a Test :</h3>
+      <button id="createTest" type="button" class="btn btn-outline-success mt-4" onclick="createTest();">Create
+        Test</button>
+      <div class="justify-content-center mb-10 row mt-10">
+        <div id="testForm" class="border border-dark rounded col-md-10"
+          style="max-width: 70vw; padding: 0 !important; display: none;">
+          <div class="pb-3 pt-3 mb-3 pl-2" style="background-color: #2c75ff;">
+            <h3 class="display-4 text-white" style="font-size: large;">Fill the form</h3>
+          </div>
+          <form>
+            <div class="form-group row pl-2">
+              <label for="input10" class="col-sm-4 col-form-label">Test Name :</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="input10" placeholder="enter test name">
+                <div id="invalid10" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input14" class="col-sm-4 col-form-label">Test Description :</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="input14">
+                <div id="invalid14" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input11" class="col-sm-4 col-form-label">date of test :</label>
+              <div class="col-sm-6">
+                <input type="text" name="date" class="form-control datepicker" autocomplete="off" id="input11">
+                <script type="text/javascript">
+                  $('.datepicker').datepicker({
+                        format: 'dd/mm/yyyy',
+                        startDate: new Date()
+                      });
+                </script>
+                <div id="invalid11" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input12" class="col-sm-4 col-form-label">test starts at :</label>
+              <div class="col-sm-6">
+                <input type="time" class="form-control" id="input12">
+                <div id="invalid12" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input13" class="col-sm-4 col-form-label">Login at :</label>
+              <div class="col-sm-6">
+                <input type="time" class="form-control d-inline-flex" id="input13" style="max-width: 170px;">
+                <div id="invalid13" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input15" class="col-sm-4 col-form-label">no. of Easy Questions :</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="input15">
+                <div id="invalid15" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input16" class="col-sm-4 col-form-label">no. of Medium Questions :</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="input16">
+                <div id="invalid16" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input17" class="col-sm-4 col-form-label">no. of Hard Questions :</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="input17">
+                <div id="invalid17" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row pl-2">
+              <label for="input18" class="col-sm-4 col-form-label">duration of test :</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="input18" placeholder="enter test duration in minutes">
+                <div id="invalid18" class="invalid-feedback"></div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-12 d-flex inline-flex">
+                <button type="button" id="addTest" class="btn btn-success mt-2 ml-2" onclick="validateAll()">Add
+                  Test</button>
+                <button type="button" id="cancel" class="btn btn-secondary mt-2 ml-2 mr-auto" style="display: none;"
+                  onclick="revertTestForm()">Cancel</button>
+                <button type="button" id="deleteTest" class="btn btn-danger mt-2 mr-2 float-right"
+                  style="display: none;">Delete Test</button>
+              </div>
+            </div>
+          </form>
+        </div>
+    
+      </div>
+    </div>
 	</div>
 
   <div id="container-2" style="margin-left: 5vw; margin-right: 5vw; display: none;">
