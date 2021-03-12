@@ -790,7 +790,7 @@ socket.on("showTestList", (test)=>{
         let text = "Updating test please wait"
         document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
         $('#modal').modal('toggle');
-        document.getElementById(test.testName).style.display="none"
+        //document.getElementById(test.testName).style.display="none"
         for(let i = 0; i < 9; i++)
         {
             if(ogvalues[i] != document.getElementById("input1"+i).value)
@@ -813,7 +813,7 @@ socket.on("showTestList", (test)=>{
     }
 })
 
-socket.on("testUpdated", ()=>{
+socket.on("testUpdated", (testName)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully Updated the test</p>';
     let timeOut = setTimeout(() => {
@@ -830,6 +830,13 @@ socket.on("testUpdated", ()=>{
     else
     {
         testTime = testTime + " mins"
+    }
+    for(let i = 0; i < document.getElementsByClassName('card').length; i++)
+    {
+        if(testName == document.getElementsByClassName('card')[i].id)
+        {
+            document.getElementsByClassName('card')[i].style.display = "none"
+        }
     }
     let cardDate = [document.getElementById("input10").value, document.getElementById("input14").value, true, document.getElementById("input11").value, document.getElementById("input12").value, document.getElementById("input13").value, testTime]
     placeTestCards(cardDate)

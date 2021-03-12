@@ -626,16 +626,6 @@ io.on('connection', function(socket){
 
     socket.on("updateTest", async (d)=>{
         let test = await Tests.findOne({"testName":d.testName})
-        // let schemaKeys = Object.keys(test.toObject());
-        // console.log(schemaKeys[0])
-        // for(let i = 0; i < (schemaKeys.length - 1); i++)
-        // {
-        //     if(_testData[i] != "")
-        //     {
-        //         test.schemaKeys[i] = _testData[i]
-        //         console.log(test.schemaKeys[i]+ "  " + _testData[i])
-        //     }
-        // }
         if(d.listofInputs[0] != "")
             test.testName = d.listofInputs[0]
         if(d.listofInputs[1] != "")
@@ -646,16 +636,25 @@ io.on('connection', function(socket){
             test.timeFrom = d.listofInputs[3]
         if(d.listofInputs[4] != "")
             test.description = d.listofInputs[4]
-        if(d.listofInputs[5] != "")
-            test.noofquestions[0] = d.listofInputs[5]
-        if(d.listofInputs[6] != "")
-            test.noofquestions[1] = d.listofInputs[6]
-        if(d.listofInputs[7] != "")
-            test.noofquestions[2] = d.listofInputs[7]
         if(d.listofInputs[8] != "")
             test.testTime = d.listofInputs[8]
+        if(d.listofInputs[5] != "")
+        {
+            test.noofquestions[0] = d.listofInputs[5]
+            test.markModified('noofquestions')
+        }
+        if(d.listofInputs[6] != "")
+        {
+            test.noofquestions[1] = d.listofInputs[6]
+            test.markModified('noofquestions')
+        }
+        if(d.listofInputs[7] != "")
+        {
+            test.noofquestions[2] = d.listofInputs[7]
+            test.markModified('noofquestions')
+        }
         await test.save()
-        socket.emit("testUpdated")
+        socket.emit("testUpdated", d.testName)
     })
 
     socket.on("deleteTest", async (testName)=>{
