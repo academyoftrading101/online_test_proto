@@ -7,10 +7,41 @@ var testName = ""
 var userId = ""
 var submitted = false
 var startTime = ""
+testName = getCookie("testName");
+userId = getCookie("userId");
+socket.emit("joinRoom", testName)
+socket.on("peerToAdmin", ()=>{
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      }).then((_stream)=>{dopeer(_stream, 'Admin')}).catch(e => {alert(`getusermedia error ${e.name}`);})
+})
 
-
-
-
+function dopeer(stream, id2) {
+    peer = new Peer({ host: 'peerjs-server.herokuapp.com', secure: true, port: 443, config: { 'iceServers': [{ urls: ["stun:bn-turn1.xirsys.com"] }, { username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==", credential: "a930829e-80ab-11eb-8bb9-0242ac140004", urls: ["turn:bn-turn1.xirsys.com:80?transport=udp", "turn:bn-turn1.xirsys.com:3478?transport=udp", "turn:bn-turn1.xirsys.com:80?transport=tcp", "turn:bn-turn1.xirsys.com:3478?transport=tcp", "turns:bn-turn1.xirsys.com:443?transport=tcp", "turns:bn-turn1.xirsys.com:5349?transport=tcp"] }] } });
+    peer.on('open', function (id) {
+        var call = peer.call(id2, stream);
+        if (window.Worker) {
+            let worker = new Worker('/scripts/workers/callTimer.js');
+            worker.postMessage("start")
+            worker.onmessage = (e)=>{
+                if(e.data == "check")
+                {
+                    if(!call.open)
+                    {
+                        //console.log("calling again")
+                        call = peer.call(id2, stream);
+                    }
+                    else
+                    {
+                        worker.terminate();
+                    }
+                }
+            }
+        }
+        
+    });
+}
 
 
 
@@ -60,10 +91,8 @@ function loadTest()
     distributeQuestions()
 }
 
-async function distributeQuestions()
+function distributeQuestions()
 {
-    testName = await getCookie("testName");
-    userId = await getCookie("userId");
     socket.emit("getQuestions", testName)
     
 }

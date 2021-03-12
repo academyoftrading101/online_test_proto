@@ -9,39 +9,33 @@ var peer
 
 function testio()
 {
- peer = new Peer('Admin', 
- {host:'peerjs-server.herokuapp.com', secure:true, port:443, config: {'iceServers': [{   urls: [ "stun:bn-turn1.xirsys.com" ]}, {   username: "OX3gCtR7jsVtfqLkFmlXTvYjcubQOdb1jWLMreYyRSLKvhYBdWkLqD7jzRLLuKmFAAAAAGBIgYVzdHJpZGVy",   credential: "9b36718e-8179-11eb-9cee-0242ac140004",   urls: [       "turn:bn-turn1.xirsys.com:80?transport=udp",       "turn:bn-turn1.xirsys.com:3478?transport=udp",       "turn:bn-turn1.xirsys.com:80?transport=tcp",       "turn:bn-turn1.xirsys.com:3478?transport=tcp",       "turns:bn-turn1.xirsys.com:443?transport=tcp",       "turns:bn-turn1.xirsys.com:5349?transport=tcp"   ]}]}});
+    socket.emit("createRoom", "test")
+    peer = new Peer('Admin', { host: 'peerjs-server.herokuapp.com', secure: true, port: 443, config: { 'iceServers': [{ urls: ["stun:bn-turn1.xirsys.com"] }, { username: "OX3gCtR7jsVtfqLkFmlXTvYjcubQOdb1jWLMreYyRSLKvhYBdWkLqD7jzRLLuKmFAAAAAGBIgYVzdHJpZGVy", credential: "9b36718e-8179-11eb-9cee-0242ac140004", urls: ["turn:bn-turn1.xirsys.com:80?transport=udp", "turn:bn-turn1.xirsys.com:3478?transport=udp", "turn:bn-turn1.xirsys.com:80?transport=tcp", "turn:bn-turn1.xirsys.com:3478?transport=tcp", "turns:bn-turn1.xirsys.com:443?transport=tcp", "turns:bn-turn1.xirsys.com:5349?transport=tcp"] }] } });
     peer.on('open', function (id) {
         console.log("peer open " + id)
-        document.getElementById("testtest").onclick = ()=>{
+        document.getElementById("testtest").onclick = () => {
             socket.emit("yolo", id)
-        }
-        
-        peer.on('connection', function (conn) {
-            conn.on('open', function () {
-                console.log("connected to " + conn.peer)
-                peer.on('call', function (call) {
-                    call.answer(null);
-                    call.on('stream', function (stream) {
-                        console.log("stream incoming")
-                        
-                        document.getElementById("videopl").srcObject = stream
-                    });
-                });
-                conn.on('data', function (data) {
-                    console.log('Received', data);
-                });
-            });
 
-            conn.on('close', function () {
-                console.log("disconnected with " + conn.peer)
+        }
+        peer.on('call', function (call) {
+            call.answer(null);
+            call.on('stream', function (stream) {
+                console.log("stream incoming")
+                let videoBox = document.getElementById("videosBox")
+                let video = document.createElement('video')
+                video.setAttribute("class", "mr-3")
+                video.setAttribute("width", "250px")
+                video.setAttribute("height", "200px")
+                video.autoplay = true
+                video.srcObject = stream
+                videoBox.appendChild(video)
             });
         });
     });
- peer.on('close', function(){
-     console.log("disconnected with ")
- })
- 
+    peer.on('close', function () {
+        console.log("disconnected with ")
+    })
+
 }
 
 
@@ -258,14 +252,16 @@ function placeTestCards(data)
         proctor.setAttribute("class", "btn btn-outline-success")
         var d = new Date(),
             h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
-            m = (d.getMinutes() < 10 ? '0' : '') + (d.getMinutes()+1);
+            h2 = (d.getHours() < 10 ? '0' : '') + (d.getHours()+1),
+            m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         var time = h + ':' + m;
+        var time2 = h2 + ':' + m;
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); 
         var yyyy = today.getFullYear();
         today = dd + '/' + mm + '/' + yyyy;
-        if(time >= data[4] && today == data[3])
+        if(time >= data[4] && today == data[3] && data[4] <= time2)
         {
             proctor.disabled = false
         }

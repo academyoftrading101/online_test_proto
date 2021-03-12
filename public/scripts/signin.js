@@ -1,44 +1,38 @@
 
 const socket = io.connect();
 
+
 var peer  = null
 
 socket.on("yolo", (id2)=>{
     console.log("yolo called")
+    socket.emit("createRoom", "test")
+    try
+    {
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false
           }).then((_stream)=>{dopeer(_stream, 'Admin')}).catch(e => {alert(`getusermedia error ${e.name}`);})
+    }
+    catch
+    {
+
+    }
+       
 })
 
-
+socket.on("yolo2", ()=>{
+    console.log("yolo?")
+})
 
 function dopeer(stream, id2) {
     peer = new Peer({ host: 'peerjs-server.herokuapp.com', secure: true, port: 443, config: { 'iceServers': [{ urls: ["stun:bn-turn1.xirsys.com"] }, { username: "2DESHRopnmBH54Nl0LnZp4iY6WQdMmKK05RhglV0NRjsX2EP67KUq48J0bSiHsyTAAAAAGBHKAFvbmxpbmV0ZXN0LXByb3RvdHlwZQ==", credential: "a930829e-80ab-11eb-8bb9-0242ac140004", urls: ["turn:bn-turn1.xirsys.com:80?transport=udp", "turn:bn-turn1.xirsys.com:3478?transport=udp", "turn:bn-turn1.xirsys.com:80?transport=tcp", "turn:bn-turn1.xirsys.com:3478?transport=tcp", "turns:bn-turn1.xirsys.com:443?transport=tcp", "turns:bn-turn1.xirsys.com:5349?transport=tcp"] }] } });
     
     peer.on('open', function (id) {
-        console.log("peer open "+id)
-        var conn = peer.connect(id2);
-        conn.on('open', async function () {
-            console.log("connected to admin")
-            
-                console.log(id2)
-                var call = peer.call(id2, stream);
-                //call.on('open', )
-                peer.on('error', function(err) { console.log(err)});
-                call.on('error', function(err) { console.log(err)});
-                call.on('open', function (stream) {
-                    console.log(call.open)
-                    // `stream` is the MediaStream of the remote peer.
-                    // Here you'd add it to an HTML video/canvas element.
-                });
-                call.on('stream', function (stream) {
-                    console.log("recieved")
-                });
-            })
-            conn.on('close', function () {
-                console.log("disconnected to admin")
-            });
+        var call = peer.call(id2, stream);
+                call.on('stream', (stream)=>{
+                    console.log("call connected")
+                })
         });
 }
 

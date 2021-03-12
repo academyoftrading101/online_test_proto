@@ -124,18 +124,26 @@ function removeByAttr (arr, attr, value){
     return arr;
 }
 
-var SOCKET_LIST = []
+var SOCKET_LIST = {}
 
 let testURL = ""
 
 var io = require('socket.io')(serv,{});
 
 io.on('connection', function(socket){
-    console.log("socket connected")
+    console.log("socket connected ")
 
     SOCKET = socket
     SOCKET_LIST[socket.id] = SOCKET;
 
+
+    socket.on("createRoom", testName=>{
+        
+        //console.log(socket.adapter.rooms.get(testName));
+        //io.to for all 
+        //socket.to(testName).emit('yolo2');
+        //console.log(socket.adapter.rooms.get(testName).size);
+    })
 
     socket.on("newSignUp", async (data)=>{
         let verify = await Users.find({})
@@ -186,6 +194,9 @@ io.on('connection', function(socket){
                             SOCKET.email = data[0].email
                             SOCKET.isAdmin = true
                             let testsData = await Tests.find({})
+                            //console.log(socket.id)
+                            socket.id = email
+                            //console.log(socket.id)
                             socket.emit("adminLoggedIn", data, testsData);
                         }
                         else
@@ -686,6 +697,12 @@ io.on('connection', function(socket){
 
     socket.on("yolo", id=>{
         io.sockets.emit("yolo", id)
+    })
+
+    socket.on("joinRoom", testName=>{
+        console.log("this called ?")
+        socket.join(testName)
+        socket.emit("peerToAdmin")
     })
 
     socket.on("disconnect", async ()=>{
