@@ -7,16 +7,12 @@ var peer
 
 // PEER JS STUFF
 
-function testio()
+function dopeer()
 {
     socket.emit("createRoom", "test")
     peer = new Peer('Admin', { host: 'peerjs-server.herokuapp.com', secure: true, port: 443, config: { 'iceServers': [{ urls: ["stun:bn-turn1.xirsys.com"] }, { username: "OX3gCtR7jsVtfqLkFmlXTvYjcubQOdb1jWLMreYyRSLKvhYBdWkLqD7jzRLLuKmFAAAAAGBIgYVzdHJpZGVy", credential: "9b36718e-8179-11eb-9cee-0242ac140004", urls: ["turn:bn-turn1.xirsys.com:80?transport=udp", "turn:bn-turn1.xirsys.com:3478?transport=udp", "turn:bn-turn1.xirsys.com:80?transport=tcp", "turn:bn-turn1.xirsys.com:3478?transport=tcp", "turns:bn-turn1.xirsys.com:443?transport=tcp", "turns:bn-turn1.xirsys.com:5349?transport=tcp"] }] } });
     peer.on('open', function (id) {
         console.log("peer open " + id)
-        document.getElementById("testtest").onclick = () => {
-            socket.emit("yolo", id)
-
-        }
         peer.on('call', function (call) {
             call.answer(null);
             call.on('stream', function (stream) {
@@ -33,7 +29,7 @@ function testio()
         });
     });
     peer.on('close', function () {
-        console.log("disconnected with ")
+        console.log("peer closed")
     })
 
 }
@@ -270,6 +266,7 @@ function placeTestCards(data)
             proctor.disabled = true
         }
         proctor.onclick = ()=>{
+            dopeer()
             showProctor(data)
         }
         proctor.appendChild(document.createTextNode('proctor'))
