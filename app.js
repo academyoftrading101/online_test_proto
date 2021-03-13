@@ -124,18 +124,26 @@ function removeByAttr (arr, attr, value){
     return arr;
 }
 
-var SOCKET_LIST = []
+var SOCKET_LIST = {}
 
 let testURL = ""
 
 var io = require('socket.io')(serv,{});
 
 io.on('connection', function(socket){
-    console.log("socket connected")
+    console.log("socket connected ")
 
     SOCKET = socket
     SOCKET_LIST[socket.id] = SOCKET;
 
+
+    socket.on("createRoom", testName=>{
+        
+        //console.log(socket.adapter.rooms.get(testName));
+        //io.to for all 
+        //socket.to(testName).emit('yolo2');
+        //console.log(socket.adapter.rooms.get(testName).size);
+    })
 
     socket.on("newSignUp", async (data)=>{
         let verify = await Users.find({})
@@ -161,7 +169,7 @@ io.on('connection', function(socket){
         socket.emit("signupComplete")
     })
 
-    socket.on("tryAdminLogin", async (email, pass)=>{
+    socket.on("tryAdminLogin", async (email, pass, b)=>{
         Admin.find({"email":email}, 
             async function(err, data) {
                 if(err){
@@ -179,13 +187,14 @@ io.on('connection', function(socket){
                             socket.emit("alreadyLoggedIn")
                             return
                         }
-                        if(data[0].password == pass)
+                        if(data[0].password == pass || b)
                         {
-                            data[0].alreadyLoggedIn = true
-                            await data[0].save()
                             SOCKET.email = data[0].email
                             SOCKET.isAdmin = true
                             let testsData = await Tests.find({})
+                            //console.log(socket.id)
+                            socket.id = email
+                            //console.log(socket.id)
                             socket.emit("adminLoggedIn", data, testsData);
                         }
                         else
@@ -195,7 +204,7 @@ io.on('connection', function(socket){
         });
     })
 
-    socket.on("tryLogin", async (email, pass)=>{
+    socket.on("tryLogin", async (email, pass, b)=>{
         
         await Users.find({"email":email}, 
             async function(err, data) {
@@ -214,10 +223,8 @@ io.on('connection', function(socket){
                             socket.emit("alreadyLoggedIn")
                             return
                         }
-                        if(data[0].password == pass)
+                        if(data[0].password == pass || b)
                         {
-                            data[0].alreadyLoggedIn = true
-                            await data[0].save()
                             SOCKET.email = data[0].email
                             SOCKET.isAdmin = false
                             //console.log(SOCKET_LIST)
@@ -615,16 +622,6 @@ io.on('connection', function(socket){
 
     socket.on("updateTest", async (d)=>{
         let test = await Tests.findOne({"testName":d.testName})
-        // let schemaKeys = Object.keys(test.toObject());
-        // console.log(schemaKeys[0])
-        // for(let i = 0; i < (schemaKeys.length - 1); i++)
-        // {
-        //     if(_testData[i] != "")
-        //     {
-        //         test.schemaKeys[i] = _testData[i]
-        //         console.log(test.schemaKeys[i]+ "  " + _testData[i])
-        //     }
-        // }
         if(d.listofInputs[0] != "")
             test.testName = d.listofInputs[0]
         if(d.listofInputs[1] != "")
@@ -635,16 +632,25 @@ io.on('connection', function(socket){
             test.timeFrom = d.listofInputs[3]
         if(d.listofInputs[4] != "")
             test.description = d.listofInputs[4]
-        if(d.listofInputs[5] != "")
-            test.noofquestions[0] = d.listofInputs[5]
-        if(d.listofInputs[6] != "")
-            test.noofquestions[1] = d.listofInputs[6]
-        if(d.listofInputs[7] != "")
-            test.noofquestions[2] = d.listofInputs[7]
         if(d.listofInputs[8] != "")
             test.testTime = d.listofInputs[8]
+        if(d.listofInputs[5] != "")
+        {
+            test.noofquestions[0] = d.listofInputs[5]
+            test.markModified('noofquestions')
+        }
+        if(d.listofInputs[6] != "")
+        {
+            test.noofquestions[1] = d.listofInputs[6]
+            test.markModified('noofquestions')
+        }
+        if(d.listofInputs[7] != "")
+        {
+            test.noofquestions[2] = d.listofInputs[7]
+            test.markModified('noofquestions')
+        }
         await test.save()
-        socket.emit("testUpdated")
+        socket.emit("testUpdated", d.testName)
     })
 
     socket.on("deleteTest", async (testName)=>{
@@ -682,6 +688,16 @@ io.on('connection', function(socket){
             }
         }
         socket.emit("notConfirmData")
+    })
+
+    socket.on("yolo", id=>{
+        io.sockets.emit("yolo", id)
+    })
+
+    socket.on("joinRoom", testName=>{
+        console.log("this called ?")
+        socket.join(testName)
+        socket.emit("peerToAdmin")
     })
 
     socket.on("disconnect", async ()=>{

@@ -3,13 +3,59 @@ var listofInputs = new Array(9)
 listofInputs = ["", "", "", "", "", "", "", "", ""];
 
 
-function tryLogin()
+var peer
+
+var adminrememberme = getCookie("adminrememberme")
+if(adminrememberme)
+{
+    let e = getCookie('adminemail')
+    window.onload = function() {
+        document.getElementById("admin_login_form").style.display = "none"
+        tryLogin(e, "", true)
+    }
+}
+
+// PEER JS STUFF
+
+function dopeer()
+{
+    socket.emit("createRoom", "test")
+    peer = new Peer('Admin', { host: 'peerjs-server.herokuapp.com', secure: true, port: 443, config: { 'iceServers': [{ urls: ["stun:bn-turn1.xirsys.com"] }, { username: "OX3gCtR7jsVtfqLkFmlXTvYjcubQOdb1jWLMreYyRSLKvhYBdWkLqD7jzRLLuKmFAAAAAGBIgYVzdHJpZGVy", credential: "9b36718e-8179-11eb-9cee-0242ac140004", urls: ["turn:bn-turn1.xirsys.com:80?transport=udp", "turn:bn-turn1.xirsys.com:3478?transport=udp", "turn:bn-turn1.xirsys.com:80?transport=tcp", "turn:bn-turn1.xirsys.com:3478?transport=tcp", "turns:bn-turn1.xirsys.com:443?transport=tcp", "turns:bn-turn1.xirsys.com:5349?transport=tcp"] }] } });
+    peer.on('open', function (id) {
+        console.log("peer open " + id)
+        peer.on('call', function (call) {
+            call.answer(null);
+            call.on('stream', function (stream) {
+                console.log("stream incoming")
+                let videoBox = document.getElementById("videosBox")
+                let video = document.createElement('video')
+                video.setAttribute("class", "mr-3")
+                video.setAttribute("width", "250px")
+                video.setAttribute("height", "200px")
+                video.autoplay = true
+                video.srcObject = stream
+                videoBox.appendChild(video)
+            });
+        });
+    });
+    peer.on('close', function () {
+        console.log("peer closed")
+    })
+
+}
+
+
+
+
+// PEER JS STUFF
+
+function tryLogin(e, p, b)
 {
     document.getElementById("modal-title").innerHTML = "wait";
     let text = "Signing in please wait"
     document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
     $('#modal').modal('toggle');
-    socket.emit("tryAdminLogin", document.getElementById("input0").value, document.getElementById("input1").value);
+    socket.emit("tryAdminLogin", e, p, b);
 }
 
 window.onunload = ()=>{socket.emit("logout", document.getElementById("input0").value, "admin")}
@@ -166,7 +212,6 @@ function validateAll2(testName)
     
 }
 
-
 function placeTestCards(data)
 {
     //data 0= name, 1= discription 2= isAdmin 3= date 4= time 5 = login time 6= testDuration
@@ -208,6 +253,33 @@ function placeTestCards(data)
     div1.appendChild(div3)
     if(data[2])
     {
+        let proctor = document.createElement('button')
+        proctor.setAttribute("type", "button")
+        proctor.setAttribute("class", "btn btn-outline-success")
+        var d = new Date(),
+            h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+            h2 = (d.getHours() < 10 ? '0' : '') + (d.getHours()+1),
+            m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+        var time = h + ':' + m;
+        var time2 = h2 + ':' + m;
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        var yyyy = today.getFullYear();
+        today = dd + '/' + mm + '/' + yyyy;
+        if(time >= data[4] && today == data[3] && data[4] <= time2)
+        {
+            proctor.disabled = false
+        }
+        else
+        {
+            proctor.disabled = true
+        }
+        proctor.onclick = ()=>{
+            dopeer()
+            showProctor(data)
+        }
+        proctor.appendChild(document.createTextNode('proctor'))
         let editTest = document.createElement('button')
         editTest.setAttribute("type", "button")
         editTest.setAttribute("class", "btn btn-outline-success")
@@ -215,18 +287,16 @@ function placeTestCards(data)
             showTestUpdateform(data[0])
         }
         editTest.appendChild(document.createTextNode('edit test'))
-        let test = document.createElement('button')
+        let testDetails = document.createElement('button')
         let newLink=data[0].replace(/\s+/g, '')
-        test.setAttribute("id", newLink+"details")
-        test.setAttribute("type", "button")
-        test.setAttribute("class", "btn btn-outline-info")
-        test.onclick = ()=>{
+        testDetails.setAttribute("id", newLink+"details")
+        testDetails.setAttribute("type", "button")
+        testDetails.setAttribute("class", "btn btn-outline-info")
+        testDetails.onclick = ()=>{
             //document.getElementById(newLink+"Participants").style.display = "block";
             socket.emit("noOfParticipants", {testName:data[0], id:newLink})
         }
-        test.appendChild(document.createTextNode('view details'))
-        div1.appendChild(editTest);
-        div1.appendChild(test);
+        testDetails.appendChild(document.createTextNode('view details'))
         let participants = document.createElement('div')
         participants.setAttribute("id", newLink+"Participants")
         participants.setAttribute("style", "display:none;")
@@ -236,6 +306,9 @@ function placeTestCards(data)
         participants2.setAttribute("id", newLink+"num")
         participants2.setAttribute("style", "display:none;")
         participants2.setAttribute("class", "text-center")
+        div1.appendChild(proctor);
+        div1.appendChild(editTest);
+        div1.appendChild(testDetails);
         div1.appendChild(participants2)
     }
     testList.appendChild(div1)
@@ -418,7 +491,11 @@ function loggedIn(uName)
     document.getElementById("signup").style.display = "none"
     document.getElementById("signin").style.display = "none"
     document.getElementById("logout").style.display = "block"
-    document.getElementById("logouthref").setAttribute("href", "admin")
+    document.getElementById("logout").onclick = ()=>{
+        document.cookie = "adminrememberme=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "adminemail=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.getElementById("logouthref").setAttribute("href", "admin")
+    }
 }
 
 function showTestUpdateform (testName)
@@ -449,7 +526,36 @@ function revertTestForm()
     document.getElementById("deleteTest").style.display = "none"
 }
 
+function showProctor(data)
+{
+    document.getElementById("container-1").style.display = "none"
+    document.getElementById("container-2").style.display = "block"
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+
 socket.on("adminLoggedIn", (data, data1)=>{
+    if(document.getElementById("adminrememberme").checked == true)
+    {
+        let d = new Date();
+        d.setTime(d.getTime() + (1 * 24 * 60 * 60 * 1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = "adminrememberme="+true+";" + expires
+        document.cookie = "adminemail="+data[0].email+";" + expires
+    }
     document.getElementById("input0").classList.remove("is-invalid");
     document.getElementById("input0").classList.add("is-valid");
     document.getElementById("input1").classList.remove("is-invalid");
@@ -462,7 +568,7 @@ socket.on("adminLoggedIn", (data, data1)=>{
     let timeOut = setTimeout(() => {
         $('#modal').modal('toggle');
         loggedIn(data[0].userName)
-    }, 2000);
+    }, 1000);
     $('#modal').on('hidden.bs.modal', function (e) {
         clearInterval(timeOut)
         loggedIn(data[0].userName)
@@ -481,8 +587,10 @@ socket.on("adminLoggedIn", (data, data1)=>{
         }
         let cardDate = [data1[i].testName, data1[i].description, true, data1[i].date, data1[i].startTime, data1[i].timeFrom, testTime]
         placeTestCards(cardDate)
-        
     }
+
+
+    
 });
 
 socket.on("adminLogInFailed", (data)=>{
@@ -719,7 +827,7 @@ socket.on("showTestList", (test)=>{
         let text = "Updating test please wait"
         document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
         $('#modal').modal('toggle');
-        document.getElementById(test.testName).style.display="none"
+        //document.getElementById(test.testName).style.display="none"
         for(let i = 0; i < 9; i++)
         {
             if(ogvalues[i] != document.getElementById("input1"+i).value)
@@ -742,7 +850,7 @@ socket.on("showTestList", (test)=>{
     }
 })
 
-socket.on("testUpdated", ()=>{
+socket.on("testUpdated", (testName)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: large;">Successfully Updated the test</p>';
     let timeOut = setTimeout(() => {
@@ -759,6 +867,13 @@ socket.on("testUpdated", ()=>{
     else
     {
         testTime = testTime + " mins"
+    }
+    for(let i = 0; i < document.getElementsByClassName('card').length; i++)
+    {
+        if(testName == document.getElementsByClassName('card')[i].id)
+        {
+            document.getElementsByClassName('card')[i].style.display = "none"
+        }
     }
     let cardDate = [document.getElementById("input10").value, document.getElementById("input14").value, true, document.getElementById("input11").value, document.getElementById("input12").value, document.getElementById("input13").value, testTime]
     placeTestCards(cardDate)
