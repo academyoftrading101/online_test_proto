@@ -65,7 +65,13 @@
           </div>
         </div>
         <div class="form-group row">
-          <button type="button" class="btn btn-primary mt-2 ml-4  mr-auto" onclick="tryLogin()">Sign in</button>
+          <button type="button" class="btn btn-primary mt-2 ml-4" onclick='tryLogin(document.getElementById("input0").value, document.getElementById("input1").value, false)''>Sign in</button>
+          <div class="form-check mr-auto mt-4 ml-1">
+            <input class="form-check-input" type="checkbox" id="signinrememberme">
+            <label class="form-check-label" for="signinrememberme">
+              Remember me
+            </label>
+          </div>
           <button type="button" class="btn btn-primary mt-2 mr-4" onclick="forgotpassword()">forgot password</button>
         </div>
       </form>

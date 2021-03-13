@@ -5,6 +5,16 @@ listofInputs = ["", "", "", "", "", "", "", "", ""];
 
 var peer
 
+var adminrememberme = getCookie("adminrememberme")
+if(adminrememberme)
+{
+    let e = getCookie('adminemail')
+    window.onload = function() {
+        document.getElementById("admin_login_form").style.display = "none"
+        tryLogin(e, "", true)
+    }
+}
+
 // PEER JS STUFF
 
 function dopeer()
@@ -39,13 +49,13 @@ function dopeer()
 
 // PEER JS STUFF
 
-function tryLogin()
+function tryLogin(e, p, b)
 {
     document.getElementById("modal-title").innerHTML = "wait";
     let text = "Signing in please wait"
     document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">'+text+'</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
     $('#modal').modal('toggle');
-    socket.emit("tryAdminLogin", document.getElementById("input0").value, document.getElementById("input1").value);
+    socket.emit("tryAdminLogin", e, p, b);
 }
 
 window.onunload = ()=>{socket.emit("logout", document.getElementById("input0").value, "admin")}
@@ -481,7 +491,11 @@ function loggedIn(uName)
     document.getElementById("signup").style.display = "none"
     document.getElementById("signin").style.display = "none"
     document.getElementById("logout").style.display = "block"
-    document.getElementById("logouthref").setAttribute("href", "admin")
+    document.getElementById("logout").onclick = ()=>{
+        document.cookie = "adminrememberme=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "adminemail=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.getElementById("logouthref").setAttribute("href", "admin")
+    }
 }
 
 function showTestUpdateform (testName)
@@ -518,7 +532,30 @@ function showProctor(data)
     document.getElementById("container-2").style.display = "block"
 }
 
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+
 socket.on("adminLoggedIn", (data, data1)=>{
+    if(document.getElementById("adminrememberme").checked == true)
+    {
+        let d = new Date();
+        d.setTime(d.getTime() + (1 * 24 * 60 * 60 * 1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = "adminrememberme="+true+";" + expires
+        document.cookie = "adminemail="+data[0].email+";" + expires
+    }
     document.getElementById("input0").classList.remove("is-invalid");
     document.getElementById("input0").classList.add("is-valid");
     document.getElementById("input1").classList.remove("is-invalid");
@@ -531,7 +568,7 @@ socket.on("adminLoggedIn", (data, data1)=>{
     let timeOut = setTimeout(() => {
         $('#modal').modal('toggle');
         loggedIn(data[0].userName)
-    }, 2000);
+    }, 1000);
     $('#modal').on('hidden.bs.modal', function (e) {
         clearInterval(timeOut)
         loggedIn(data[0].userName)

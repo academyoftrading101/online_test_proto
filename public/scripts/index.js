@@ -72,12 +72,12 @@ socket.on("testData", d=>{
         if(i == (d.length - 1))
         {
             let cardDate = [d[i].testName, d[i].description, true, d[i].date, d[i].startTime, d[i].timeFrom, testTime]
-            placeTestCards(cardDate)
+            //placeTestCards(cardDate)
         }
         else
         {
             let cardDate = [d[i].testName, d[i].description, false, d[i].date, d[i].startTime, d[i].timeFrom, testTime]
-            placeTestCards(cardDate)
+            //placeTestCards(cardDate)
         }
     }
 })

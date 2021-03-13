@@ -1,7 +1,18 @@
 
 const socket = io.connect();
 
+var testData, myTestData;
 
+
+var signinrememberme = getCookie("signinrememberme")
+if(signinrememberme)
+{
+    let e = getCookie('signinemail')
+    window.onload = function() {
+        document.getElementById("login_form").style.display = "none"
+        tryLogin(e, "", true)
+    }
+}
 var peer  = null
 
 socket.on("yolo", (id2)=>{
@@ -38,18 +49,23 @@ function dopeer(stream, id2) {
 
 
 
-window.onunload = ()=>{socket.emit("logout", document.getElementById("input0").value, "")}
+window.onunload = ()=>{
+    socket.emit("logout", document.getElementById("input0").value, "")
+}
 
 var userData;
 
-function tryLogin()
+function tryLogin(e, p, b)
 {
-    socket.emit("tryLogin", document.getElementById("input0").value, document.getElementById("input1").value);
-    document.getElementById("modal-title").innerHTML = "wait";
-    document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
-    $('#modal').modal('toggle');
+    socket.emit("tryLogin", e, p, b);
+    //if(!b)
+    {
+        document.getElementById("modal-title").innerHTML = "wait";
+        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        $('#modal').modal('toggle');
+    }
+    
 }
-
 
 
 function register(data){
@@ -143,7 +159,6 @@ function placeTestCards(data)
             if(data[7])
             {
                 lateObj[data[0]] = true
-                console.log(lateObj[data[0]])
             }
         }
         let test = document.createElement('button')
@@ -300,10 +315,23 @@ function loggedIn(uName)
     document.getElementById("signup").style.display = "none"
     document.getElementById("signin").style.display = "none"
     document.getElementById("logout").style.display = "block"
-    document.getElementById("logouthref").setAttribute("href", "signin")
+    document.getElementById("logout").onclick = ()=>{
+        document.cookie = "signinrememberme=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "signinemail=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.getElementById("logouthref").setAttribute("href", "signin")
+    }
+    
 }
 
 socket.on("LoggedIn", (data, testsData, myTestsData)=>{
+    if(document.getElementById("signinrememberme").checked == true)
+    {
+        let d = new Date();
+        d.setTime(d.getTime() + (1 * 24 * 60 * 60 * 1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = "signinrememberme="+true+";" + expires
+        document.cookie = "signinemail="+data[0].email+";" + expires
+    }
     userData = data;
     document.getElementById("input0").classList.remove("is-invalid");
     document.getElementById("input0").classList.add("is-valid");
@@ -314,15 +342,17 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     document.getElementById("modal-title").innerHTML = "Success";
     document.getElementById("modal-body").innerHTML = "Successfully Logged In";
     //$('#modal').modal('toggle');
-    let timeOut = setTimeout(() => {
-        $('#modal').modal('toggle');
-        loggedIn(data[0].userName)
-    }, 2000);
-    $('#modal').on('hidden.bs.modal', function (e) {
-        clearInterval(timeOut)
-        loggedIn(data[0].userName)
-    })
-    
+    //if(!b)
+    {
+        let timeOut = setTimeout(() => {
+            $('#modal').modal('toggle');
+            loggedIn(data[0].userName)
+        }, 1000);
+        $('#modal').on('hidden.bs.modal', function (e) {
+            clearInterval(timeOut)
+            loggedIn(data[0].userName)
+        })
+    }
     for(let i = 0; i<testsData.length; i++)
     {
         let testTime = testsData[i].testTime

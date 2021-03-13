@@ -169,7 +169,7 @@ io.on('connection', function(socket){
         socket.emit("signupComplete")
     })
 
-    socket.on("tryAdminLogin", async (email, pass)=>{
+    socket.on("tryAdminLogin", async (email, pass, b)=>{
         Admin.find({"email":email}, 
             async function(err, data) {
                 if(err){
@@ -187,10 +187,8 @@ io.on('connection', function(socket){
                             socket.emit("alreadyLoggedIn")
                             return
                         }
-                        if(data[0].password == pass)
+                        if(data[0].password == pass || b)
                         {
-                            data[0].alreadyLoggedIn = true
-                            await data[0].save()
                             SOCKET.email = data[0].email
                             SOCKET.isAdmin = true
                             let testsData = await Tests.find({})
@@ -206,7 +204,7 @@ io.on('connection', function(socket){
         });
     })
 
-    socket.on("tryLogin", async (email, pass)=>{
+    socket.on("tryLogin", async (email, pass, b)=>{
         
         await Users.find({"email":email}, 
             async function(err, data) {
@@ -225,10 +223,8 @@ io.on('connection', function(socket){
                             socket.emit("alreadyLoggedIn")
                             return
                         }
-                        if(data[0].password == pass)
+                        if(data[0].password == pass || b)
                         {
-                            data[0].alreadyLoggedIn = true
-                            await data[0].save()
                             SOCKET.email = data[0].email
                             SOCKET.isAdmin = false
                             //console.log(SOCKET_LIST)
