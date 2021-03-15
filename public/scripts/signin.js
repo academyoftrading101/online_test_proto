@@ -103,22 +103,23 @@ function placeTestCards(data)
     let testList = document.getElementById(data[6])
     let div1 = document.createElement('div')
     if(data[7])
+    {
         div1.setAttribute("id", data[0]+"1")
+    }
     else
+    {
         div1.setAttribute("id", data[0]+"0")
-    div1.setAttribute("class", "card mb-3")
-    if(data[7])
-        div1.setAttribute("style", "max-width: 18rem; background-color: #AFF9CA")
-    else
-        div1.setAttribute("style", "max-width: 18rem; background-color: #FAFAA3")
-    //let div2 = document.createElement('div')
-    //div2.setAttribute("class", "card-header")
-    //div2.appendChild(document.createTextNode("Test"))
+    }
+    div1.setAttribute("class", "card mb-3 shadow")
+    div1.setAttribute("style", "padding: 0; background-size: auto; min-height: 375px")
+    let div2 = document.createElement('div')
+    div2.setAttribute("class", "card-header cb shadow card-title text-center")
+    div2.appendChild(document.createTextNode(data[0]))
     let div3 = document.createElement('div')
     div3.setAttribute("class", "card-body")
-    let h5 = document.createElement('h5')
-    h5.setAttribute("class", "card-title")
-    h5.appendChild(document.createTextNode(data[0]))
+    // let h5 = document.createElement('h5')
+    // h5.setAttribute("class", "card-title")
+    // h5.appendChild(document.createTextNode(data[0]))
     let p1 = document.createElement('p')
     p1.setAttribute("class", "card-text")
     p1.appendChild(document.createTextNode(data[1]))
@@ -130,17 +131,22 @@ function placeTestCards(data)
     p3.appendChild(document.createTextNode("test starts at : "+data[4]))
     let p4 = document.createElement('p')
     p4.setAttribute("class", "card-text")
-    p4.appendChild(document.createTextNode("login after : "+data[5] + " no late entry would be allowed"))
+    p4.setAttribute("style", "margin-bottom:0;")
+    p4.appendChild(document.createTextNode("login after : "+data[5]))
     let p5 = document.createElement('p')
     p5.setAttribute("class", "card-text")
-    p5.appendChild(document.createTextNode("test duration : "+data[8]))
+    p5.appendChild(document.createTextNode("(no late entry would be allowed)"))
+    let p6 = document.createElement('p')
+    p6.setAttribute("class", "card-text")
+    p6.appendChild(document.createTextNode("test duration : "+data[8]))
     
-    div3.appendChild(h5)
+    //div3.appendChild(h5)
     div3.appendChild(p1)
     div3.appendChild(p2)
     div3.appendChild(p3)
     div3.appendChild(p4)
     div3.appendChild(p5)
+    div3.appendChild(p6)
     if(!data[2])
     {
         var today = new Date();
@@ -161,14 +167,17 @@ function placeTestCards(data)
                 lateObj[data[0]] = true
             }
         }
-        let test = document.createElement('button')
+        let div4 = document.createElement('div')
+        div4.setAttribute("class", "text-center d-flex inline-flex")
+        let test = document.createElement('img')
         test.setAttribute("id", "startTest"+data[0])
-        test.setAttribute("type", "button")
-        test.setAttribute("class", "btn btn-outline-success col-md-6")
+        test.setAttribute("class", "hov mr-1 mt-2")
+        test.setAttribute("style", "max-height:45px")
         let testName = data[0]
         if(data[7] && !data[9] && !lateObj[data[0]])
         {
             
+            test.setAttribute("src", "/UI/Component 20 (1).svg")
             test.onclick = () => {
                 socket.emit("confirmData", { uid: userData[0]._id, testName: data[0] })
                 document.getElementById("modal-title").innerHTML = "wait";
@@ -249,35 +258,46 @@ function placeTestCards(data)
                     })
                 })
             }
-            test.appendChild(document.createTextNode("Take Test"))
-            div3.appendChild(test);
+            div4.appendChild(test);
+            div3.appendChild(div4)
         }
         else if(!data[7])
         {
+            test.classList.remove("mr-1")
+            test.classList.remove("mt-2")
+            div4.classList.remove("d-flex")
+            div4.classList.remove("inline-flex")
+            test.setAttribute("src", "/UI/register.svg")
+            test.setAttribute("style", "")
             test.onclick = ()=>{
                 register(data);
             }
-            test.appendChild(document.createTextNode("register"))
-            div3.appendChild(test);
+            div4.appendChild(test);
+            div3.appendChild(div4)
         }     
+        if(data[7])
+        {
+            div3.setAttribute("style", "background-color: #7a64ff; color:white;")
+        }
         
         if(data[7] && !data[9] && !lateObj[data[0]])
         {
-            let test2 = document.createElement('button')
+            let test2 = document.createElement('img')
+            test2.setAttribute("src", "/UI/Component 21 (2) (1).svg")
+            test2.setAttribute("style", "max-height:45px")
+            test2.setAttribute("class", "hov mt-2")
             test2.setAttribute("id", "unregister"+data[0])
-            test2.setAttribute("type", "button")
-            test2.setAttribute("class", "btn btn-outline-danger col-md-5 offset-md-1")
-            test2.appendChild(document.createTextNode("unregister"))
             test2.onclick = ()=>{
                 document.getElementById("modal-title").innerHTML = "wait";
                 document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Unregistering please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
                 $('#modal').modal('toggle');
                 socket.emit("unregister", {uid:userData[0]._id, testName:data[0]} )
             }
-            div3.appendChild(test2);
+            div4.appendChild(test2);
+            div3.appendChild(div4)
         }
     }
-    //div1.appendChild(div2)
+    div1.appendChild(div2)
     div1.appendChild(div3)
     if(data[7])
         {

@@ -132,5 +132,17 @@
 }
 
 .bg {
-  background-color: #5084F5;
+  background-image: url(/UI/screen\ 1\ background.svg);
+  background-size: 100vw auto;
+  background-repeat: no-repeat;
+}
+
+.cb {
+  background-color: #e6e3fa;
+}
+
+.register {
+  background-image: url(/UI/register.svg);
+  background-size:auto 100%;
+  background-repeat: no-repeat;
 }
