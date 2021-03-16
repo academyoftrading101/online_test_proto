@@ -61,7 +61,7 @@ function tryLogin(e, p, b)
     //if(!b)
     {
         document.getElementById("modal-title").innerHTML = "wait";
-        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        document.getElementById("modal-body").innerHTML = '<div class=""><div><p class="text-center display-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="text-center mt-5"><span "><img height="150" src="/kid.gif"></span></div></div>'
         $('#modal').modal('toggle');
     }
     
@@ -73,7 +73,7 @@ function register(data){
     socket.emit("register", {id:userData[0]._id, d:data})
     document.getElementById("modal-title").innerHTML = "wait";
     document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Registering for the test please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
     // document.getElementById("modal-title").innerHTML = "Waiting";
     // document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: x-large;">Registering...</p>';
     // $('#modal').modal('toggle');
@@ -360,14 +360,15 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     document.getElementById("invalid0").innerHTML = ""
     document.getElementById("invalid1").innerHTML = ""
     document.getElementById("modal-title").innerHTML = "Success";
-    document.getElementById("modal-body").innerHTML = "Successfully Logged In";
+    document.getElementById("modal-body").classList.add("text-center")
+    document.getElementById("modal-body").innerHTML = '<img height="100px" src="/test.gif">' + "<br>" + "<div class='mt-5'>Successfully Logged In </div>";
     //$('#modal').modal('toggle');
     //if(!b)
     {
         let timeOut = setTimeout(() => {
             $('#modal').modal('toggle');
             loggedIn(data[0].userName)
-        }, 1000);
+        }, 3500);
         $('#modal').on('hidden.bs.modal', function (e) {
             clearInterval(timeOut)
             loggedIn(data[0].userName)
@@ -418,7 +419,7 @@ socket.on("LogInFailed", (data)=>{
     //$('#modal').modal('toggle');
     let timeOut = setTimeout(() => {
         $('#modal').modal('toggle');
-    }, 2000);
+    }, 3000);
     $('#modal').on('hidden.bs.modal', function (e) {
         clearInterval(timeOut)
     })
