@@ -168,7 +168,7 @@ function placeTestCards(data)
             }
         }
         let div4 = document.createElement('div')
-        div4.setAttribute("class", "text-center d-flex inline-flex")
+        div4.setAttribute("class", "text-center")
         let test = document.createElement('img')
         test.setAttribute("id", "startTest"+data[0])
         test.setAttribute("class", "hov mr-1 mt-2")
@@ -179,12 +179,19 @@ function placeTestCards(data)
             
             test.setAttribute("src", "/UI/Component 20 (1).svg")
             test.onclick = () => {
-                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0] })
+                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0], type:"test" })
                 document.getElementById("modal-title").innerHTML = "wait";
                 document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Checking details please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
                 $('#modal').modal('toggle');
                 socket.on("confirmData", () => {
-                    $('#modal').modal('toggle');
+                    document.getElementById("modal-title").innerHTML = "Success";
+                    document.getElementById("modal-body").innerHTML = "<div><p class='display-4 mr-4' style='font-size:medium; margin-bottom:0; margin-top:0.1rem'>All good, let's start the test</p></div></div>"
+                    let timeOut = setTimeout(() => {
+                        $('#modal').modal('toggle');
+                    }, 1000);
+                    $('#modal').on('hidden.bs.modal', function (e) {
+                        clearInterval(timeOut)
+                    })
                     var today = new Date();
                     var dd = String(today.getDate()).padStart(2, '0');
                     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -212,7 +219,7 @@ function placeTestCards(data)
                                 document.cookie = "userId=" + userData[0]._id + ";" + expires
                                 let newUrl = "/" + data[0]
                                 newUrl = newUrl.replaceAll(/ /g, "%20")
-                                socket.emit("newUrl", newUrl)
+                                socket.emit("newUrl", newUrl, "test")
                                 socket.on("newUrl", (url) => {
                                     document.getElementById("modal-title").innerHTML = "wait";
                                     document.getElementById("modal-body").innerHTML = "starting test please wait";
@@ -260,6 +267,54 @@ function placeTestCards(data)
             }
             div4.appendChild(test);
             div3.appendChild(div4)
+            let test3 = document.createElement('img')
+            test3.setAttribute("src", "/UI/Component 21 (2) (1).svg")
+            test3.setAttribute("style", "max-height:45px")
+            test3.setAttribute("class", "hov mt-2")
+            test3.setAttribute("id", "material"+data[0])
+            test3.onclick = ()=>{
+                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0], type:"material" })
+                document.getElementById("modal-title").innerHTML = "wait";
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Checking details please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
+                socket.on("confirmData2", () => {
+                    var d = new Date();
+                    d.setTime(d.getTime() + (12 * 60 * 60 * 1000));
+                    var expires = "expires=" + d.toUTCString();
+                    document.cookie = "testName=" + data[0] + ";" + expires
+                    document.getElementById("modal-title").innerHTML = "Success";
+                    document.getElementById("modal-body").innerHTML = "<div><p class='display-4 mr-4' style='font-size:medium; margin-bottom:0; margin-top:0.1rem'>All good, let's get you some material</p></div></div>"
+                    let timeOut = setTimeout(() => {
+                        $('#modal').modal('toggle');
+                    }, 2000);
+                    $('#modal').on('hidden.bs.modal', function (e) {
+                        clearInterval(timeOut)
+                    })
+                    let newUrl = "/material%20for%20" + data[0]
+                    newUrl = newUrl.replaceAll(/ /g, "%20")
+                    socket.emit("newUrl", newUrl, "material")
+                    socket.on("newUrl2", (url) => {
+                        setTimeout(() => {
+                            location.href = url
+                        }, 2000);
+                    })
+                })
+            }
+            div4.appendChild(test3);
+            div3.appendChild(div4)
+            let test2 = document.createElement('img')
+            test2.setAttribute("src", "/UI/Component 21 (2) (1).svg")
+            test2.setAttribute("style", "max-height:45px")
+            test2.setAttribute("class", "hov mt-2")
+            test2.setAttribute("id", "unregister"+data[0])
+            test2.onclick = ()=>{
+                document.getElementById("modal-title").innerHTML = "wait";
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Unregistering please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
+                socket.emit("unregister", {uid:userData[0]._id, testName:data[0]} )
+            }
+            div4.appendChild(test2);
+            div3.appendChild(div4)
         }
         else if(!data[7])
         {
@@ -278,23 +333,6 @@ function placeTestCards(data)
         if(data[7])
         {
             div3.setAttribute("style", "background-color: #7a64ff; color:white;")
-        }
-        
-        if(data[7] && !data[9] && !lateObj[data[0]])
-        {
-            let test2 = document.createElement('img')
-            test2.setAttribute("src", "/UI/Component 21 (2) (1).svg")
-            test2.setAttribute("style", "max-height:45px")
-            test2.setAttribute("class", "hov mt-2")
-            test2.setAttribute("id", "unregister"+data[0])
-            test2.onclick = ()=>{
-                document.getElementById("modal-title").innerHTML = "wait";
-                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Unregistering please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
-                $('#modal').modal('toggle');
-                socket.emit("unregister", {uid:userData[0]._id, testName:data[0]} )
-            }
-            div4.appendChild(test2);
-            div3.appendChild(div4)
         }
     }
     div1.appendChild(div2)

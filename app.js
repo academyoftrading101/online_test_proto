@@ -480,13 +480,26 @@ io.on('connection', function(socket){
         }
     })
 
-    socket.on("newUrl", d=>{
+    socket.on("newUrl", (d, e)=>{
         testURL = d
-        app.get(d, (req, res) =>
+        if(e == "test")
         {
-            res.sendFile(__dirname + '/test.html');
-        }); 
-        socket.emit("newUrl", d)
+            app.get(d, (req, res) =>
+            {
+                res.sendFile(__dirname + '/test.html');
+            }); 
+            socket.emit("newUrl", d)
+        }
+        
+        else
+        {
+            app.get(d, (req, res) =>
+            {
+                res.sendFile(__dirname + '/material.html');
+            }); 
+            socket.emit("newUrl2", d)
+        }
+        
     })
 
     socket.on("getQuestions", async (testName)=>{
@@ -586,15 +599,15 @@ io.on('connection', function(socket){
     })
 
     socket.on("reloaded", async ()=>{
-        await app.delete(testURL, (req, res) => {
-            res.send("deleted")
-            console.log("deleted " + testURL)  
-        }) 
-        app.get(testURL, (req, res) =>
-        {
-            res.sendFile(__dirname + 'index.html');
-        }); 
-        socket.emit("newUrl", testURL)
+        // await app.delete(testURL, (req, res) => {
+        //     res.send("deleted")
+        //     console.log("deleted " + testURL)  
+        // }) 
+        // app.get(testURL, (req, res) =>
+        // {
+        //     res.sendFile(__dirname + 'index.html');
+        // }); 
+        // socket.emit("newUrl", testURL)
     })
 
     socket.on("checkReattempt", async (d)=>{
@@ -683,12 +696,18 @@ io.on('connection', function(socket){
             {
                 if(allgood)
                 {
+                    if(d.type == "test")
                     socket.emit("confirmData")
+                    else
+                    socket.emit("confirmData2")
                 }
                 return
             }
         }
+        if(d.type == "test")
         socket.emit("notConfirmData")
+        else
+        socket.emit("notConfirmData2")
     })
 
     socket.on("yolo", id=>{
