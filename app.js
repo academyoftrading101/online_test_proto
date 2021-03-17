@@ -74,7 +74,10 @@ app.get('/signin', (req, res) =>
     
 }); 
 
-
+app.get('/n', (req, res) =>
+{
+    res.sendFile(__dirname + '/material.html');
+}); 
 
 app.use(express.static(__dirname + '/public'));
 

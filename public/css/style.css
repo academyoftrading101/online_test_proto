@@ -146,3 +146,9 @@
   background-size:auto 100%;
   background-repeat: no-repeat;
 }
+
+.pdf {
+  width: 80vw;
+  height: 1180px;
+  margin-bottom: 4rem;
+}
