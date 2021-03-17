@@ -6,6 +6,10 @@
   margin-top: 15vh;
 }
 
+.mt-mid {
+  margin-top: 40%vh;
+}
+
 .mb-10{
     margin-bottom: 10vh;
 }
@@ -151,4 +155,21 @@
   width: 80vw;
   height: 1180px;
   margin-bottom: 4rem;
+}
+
+.shadow-bottom {
+  box-shadow: 0 8px 6px -6px black;
+}
+
+.btn-img-login {
+  background-image: url(/UI/login\ in\ button.svg);
+  background-size: auto;
+}
+
+.hov-pointer:hover{
+  cursor: pointer;
+}
+
+.bg2 {
+  width: 100%;
 }
