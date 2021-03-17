@@ -171,5 +171,20 @@
 }
 
 .bg2 {
-  width: 100%;
+  background-image: url(/UI/email\ id\ password\ window.svg);
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: cover;
+}
+
+.cropped2 {
+  width: 100%; /* width of container */
+  height: 300px; /* height of container */
+  object-fit: cover;
+  object-position: 100% 50%; /* try 20px 10px */ 
+  border: 5px solid black;
+}
+
+#ehh {
+  overflow-y: hidden;
 }
