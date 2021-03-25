@@ -61,7 +61,7 @@ function tryLogin(e, p, b)
     //if(!b)
     {
         document.getElementById("modal-title").innerHTML = "wait";
-        document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+        document.getElementById("modal-body").innerHTML = '<div class=""><div><p class="text-center display-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Signing in please wait</p></div><div class="text-center mt-5"><span "><img height="150" src="/kid.gif"></span></div></div>'
         $('#modal').modal('toggle');
     }
     
@@ -73,7 +73,7 @@ function register(data){
     socket.emit("register", {id:userData[0]._id, d:data})
     document.getElementById("modal-title").innerHTML = "wait";
     document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Registering for the test please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
-    $('#modal').modal('toggle');
+    //$('#modal').modal('toggle');
     // document.getElementById("modal-title").innerHTML = "Waiting";
     // document.getElementById("modal-body").innerHTML = '<p class="d-inline-flex display-4" style="font-size: x-large;">Registering...</p>';
     // $('#modal').modal('toggle');
@@ -103,22 +103,23 @@ function placeTestCards(data)
     let testList = document.getElementById(data[6])
     let div1 = document.createElement('div')
     if(data[7])
+    {
         div1.setAttribute("id", data[0]+"1")
+    }
     else
+    {
         div1.setAttribute("id", data[0]+"0")
-    div1.setAttribute("class", "card mb-3")
-    if(data[7])
-        div1.setAttribute("style", "max-width: 18rem; background-color: #AFF9CA")
-    else
-        div1.setAttribute("style", "max-width: 18rem; background-color: #FAFAA3")
-    //let div2 = document.createElement('div')
-    //div2.setAttribute("class", "card-header")
-    //div2.appendChild(document.createTextNode("Test"))
+    }
+    div1.setAttribute("class", "card mb-3 shadow")
+    div1.setAttribute("style", "padding: 0; background-size: auto; min-height: 375px")
+    let div2 = document.createElement('div')
+    div2.setAttribute("class", "card-header cb shadow card-title text-center")
+    div2.appendChild(document.createTextNode(data[0]))
     let div3 = document.createElement('div')
     div3.setAttribute("class", "card-body")
-    let h5 = document.createElement('h5')
-    h5.setAttribute("class", "card-title")
-    h5.appendChild(document.createTextNode(data[0]))
+    // let h5 = document.createElement('h5')
+    // h5.setAttribute("class", "card-title")
+    // h5.appendChild(document.createTextNode(data[0]))
     let p1 = document.createElement('p')
     p1.setAttribute("class", "card-text")
     p1.appendChild(document.createTextNode(data[1]))
@@ -130,17 +131,22 @@ function placeTestCards(data)
     p3.appendChild(document.createTextNode("test starts at : "+data[4]))
     let p4 = document.createElement('p')
     p4.setAttribute("class", "card-text")
-    p4.appendChild(document.createTextNode("login after : "+data[5] + " no late entry would be allowed"))
+    p4.setAttribute("style", "margin-bottom:0;")
+    p4.appendChild(document.createTextNode("login after : "+data[5]))
     let p5 = document.createElement('p')
     p5.setAttribute("class", "card-text")
-    p5.appendChild(document.createTextNode("test duration : "+data[8]))
+    p5.appendChild(document.createTextNode("(no late entry would be allowed)"))
+    let p6 = document.createElement('p')
+    p6.setAttribute("class", "card-text")
+    p6.appendChild(document.createTextNode("test duration : "+data[8]))
     
-    div3.appendChild(h5)
+    //div3.appendChild(h5)
     div3.appendChild(p1)
     div3.appendChild(p2)
     div3.appendChild(p3)
     div3.appendChild(p4)
     div3.appendChild(p5)
+    div3.appendChild(p6)
     if(!data[2])
     {
         var today = new Date();
@@ -161,21 +167,31 @@ function placeTestCards(data)
                 lateObj[data[0]] = true
             }
         }
-        let test = document.createElement('button')
+        let div4 = document.createElement('div')
+        div4.setAttribute("class", "text-center")
+        let test = document.createElement('img')
         test.setAttribute("id", "startTest"+data[0])
-        test.setAttribute("type", "button")
-        test.setAttribute("class", "btn btn-outline-success col-md-6")
+        test.setAttribute("class", "hov mr-1 mt-2")
+        test.setAttribute("style", "max-height:45px")
         let testName = data[0]
         if(data[7] && !data[9] && !lateObj[data[0]])
         {
             
+            test.setAttribute("src", "/UI/Component 20 (1).svg")
             test.onclick = () => {
-                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0] })
+                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0], type:"test" })
                 document.getElementById("modal-title").innerHTML = "wait";
                 document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Checking details please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
                 $('#modal').modal('toggle');
                 socket.on("confirmData", () => {
-                    $('#modal').modal('toggle');
+                    document.getElementById("modal-title").innerHTML = "Success";
+                    document.getElementById("modal-body").innerHTML = "<div><p class='display-4 mr-4' style='font-size:medium; margin-bottom:0; margin-top:0.1rem'>All good, let's start the test</p></div></div>"
+                    let timeOut = setTimeout(() => {
+                        $('#modal').modal('toggle');
+                    }, 1000);
+                    $('#modal').on('hidden.bs.modal', function (e) {
+                        clearInterval(timeOut)
+                    })
                     var today = new Date();
                     var dd = String(today.getDate()).padStart(2, '0');
                     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -203,7 +219,7 @@ function placeTestCards(data)
                                 document.cookie = "userId=" + userData[0]._id + ";" + expires
                                 let newUrl = "/" + data[0]
                                 newUrl = newUrl.replaceAll(/ /g, "%20")
-                                socket.emit("newUrl", newUrl)
+                                socket.emit("newUrl", newUrl, "test")
                                 socket.on("newUrl", (url) => {
                                     document.getElementById("modal-title").innerHTML = "wait";
                                     document.getElementById("modal-body").innerHTML = "starting test please wait";
@@ -249,35 +265,77 @@ function placeTestCards(data)
                     })
                 })
             }
-            test.appendChild(document.createTextNode("Take Test"))
-            div3.appendChild(test);
-        }
-        else if(!data[7])
-        {
-            test.onclick = ()=>{
-                register(data);
+            div4.appendChild(test);
+            div3.appendChild(div4)
+            let test3 = document.createElement('img')
+            test3.setAttribute("src", "/UI/Component 21 (2) (1).svg")
+            test3.setAttribute("style", "max-height:45px")
+            test3.setAttribute("class", "hov mt-2")
+            test3.setAttribute("id", "material"+data[0])
+            test3.onclick = ()=>{
+                socket.emit("confirmData", { uid: userData[0]._id, testName: data[0], type:"material" })
+                document.getElementById("modal-title").innerHTML = "wait";
+                document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Checking details please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
+                $('#modal').modal('toggle');
+                socket.on("confirmData2", () => {
+                    var d = new Date();
+                    d.setTime(d.getTime() + (12 * 60 * 60 * 1000));
+                    var expires = "expires=" + d.toUTCString();
+                    document.cookie = "testName=" + data[0] + ";" + expires
+                    document.getElementById("modal-title").innerHTML = "Success";
+                    document.getElementById("modal-body").innerHTML = "<div><p class='display-4 mr-4' style='font-size:medium; margin-bottom:0; margin-top:0.1rem'>All good, let's get you some material</p></div></div>"
+                    let timeOut = setTimeout(() => {
+                        $('#modal').modal('toggle');
+                    }, 2000);
+                    $('#modal').on('hidden.bs.modal', function (e) {
+                        clearInterval(timeOut)
+                    })
+                    let newUrl = "/material%20for%20" + data[0]
+                    newUrl = newUrl.replaceAll(/ /g, "%20")
+                    socket.emit("newUrl", newUrl, "material")
+                    socket.on("newUrl2", (url) => {
+                        setTimeout(() => {
+                            location.href = url
+                        }, 2000);
+                    })
+                })
             }
-            test.appendChild(document.createTextNode("register"))
-            div3.appendChild(test);
-        }     
-        
-        if(data[7] && !data[9] && !lateObj[data[0]])
-        {
-            let test2 = document.createElement('button')
+            div4.appendChild(test3);
+            div3.appendChild(div4)
+            let test2 = document.createElement('img')
+            test2.setAttribute("src", "/UI/Component 21 (2) (1).svg")
+            test2.setAttribute("style", "max-height:45px")
+            test2.setAttribute("class", "hov mt-2")
             test2.setAttribute("id", "unregister"+data[0])
-            test2.setAttribute("type", "button")
-            test2.setAttribute("class", "btn btn-outline-danger col-md-5 offset-md-1")
-            test2.appendChild(document.createTextNode("unregister"))
             test2.onclick = ()=>{
                 document.getElementById("modal-title").innerHTML = "wait";
                 document.getElementById("modal-body").innerHTML = '<div class="d-flex inline-flex"><div><p class="display-4 mr-4" style="font-size:medium; margin-bottom:0; margin-top:0.1rem">Unregistering please wait</p></div><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>'
                 $('#modal').modal('toggle');
                 socket.emit("unregister", {uid:userData[0]._id, testName:data[0]} )
             }
-            div3.appendChild(test2);
+            div4.appendChild(test2);
+            div3.appendChild(div4)
+        }
+        else if(!data[7])
+        {
+            test.classList.remove("mr-1")
+            test.classList.remove("mt-2")
+            div4.classList.remove("d-flex")
+            div4.classList.remove("inline-flex")
+            test.setAttribute("src", "/UI/register.svg")
+            test.setAttribute("style", "")
+            test.onclick = ()=>{
+                register(data);
+            }
+            div4.appendChild(test);
+            div3.appendChild(div4)
+        }     
+        if(data[7])
+        {
+            div3.setAttribute("style", "background-color: #7a64ff; color:white;")
         }
     }
-    //div1.appendChild(div2)
+    div1.appendChild(div2)
     div1.appendChild(div3)
     if(data[7])
         {
@@ -340,14 +398,15 @@ socket.on("LoggedIn", (data, testsData, myTestsData)=>{
     document.getElementById("invalid0").innerHTML = ""
     document.getElementById("invalid1").innerHTML = ""
     document.getElementById("modal-title").innerHTML = "Success";
-    document.getElementById("modal-body").innerHTML = "Successfully Logged In";
+    document.getElementById("modal-body").classList.add("text-center")
+    document.getElementById("modal-body").innerHTML = '<img height="100px" src="/test.gif">' + "<br>" + "<div class='mt-5'>Successfully Logged In </div>";
     //$('#modal').modal('toggle');
     //if(!b)
     {
         let timeOut = setTimeout(() => {
             $('#modal').modal('toggle');
             loggedIn(data[0].userName)
-        }, 1000);
+        }, 3500);
         $('#modal').on('hidden.bs.modal', function (e) {
             clearInterval(timeOut)
             loggedIn(data[0].userName)
@@ -398,7 +457,7 @@ socket.on("LogInFailed", (data)=>{
     //$('#modal').modal('toggle');
     let timeOut = setTimeout(() => {
         $('#modal').modal('toggle');
-    }, 2000);
+    }, 3000);
     $('#modal').on('hidden.bs.modal', function (e) {
         clearInterval(timeOut)
     })

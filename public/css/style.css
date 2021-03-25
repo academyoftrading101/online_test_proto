@@ -6,6 +6,10 @@
   margin-top: 15vh;
 }
 
+.mt-mid {
+  margin-top: 40%vh;
+}
+
 .mb-10{
     margin-bottom: 10vh;
 }
@@ -132,5 +136,55 @@
 }
 
 .bg {
-  background-color: #5084F5;
+  background-image: url(/UI/screen\ 1\ background.svg);
+  background-size: 100vw auto;
+  background-repeat: no-repeat;
+}
+
+.cb {
+  background-color: #e6e3fa;
+}
+
+.register {
+  background-image: url(/UI/register.svg);
+  background-size:auto 100%;
+  background-repeat: no-repeat;
+}
+
+.pdf {
+  width: 80vw;
+  height: 1180px;
+  margin-bottom: 4rem;
+}
+
+.shadow-bottom {
+  box-shadow: 0 8px 6px -6px black;
+}
+
+.btn-img-login {
+  background-image: url(/UI/login\ in\ button.svg);
+  background-size: auto;
+}
+
+.hov-pointer:hover{
+  cursor: pointer;
+}
+
+.bg2 {
+  background-image: url(/UI/email\ id\ password\ window.svg);
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: cover;
+}
+
+.cropped2 {
+  width: 100%; /* width of container */
+  height: 300px; /* height of container */
+  object-fit: cover;
+  object-position: 100% 50%; /* try 20px 10px */ 
+  border: 5px solid black;
+}
+
+#ehh {
+  overflow-y: hidden;
 }
